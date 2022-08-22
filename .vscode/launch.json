@@ -10,14 +10,10 @@
       "name": "index.ts",
       "program": "${workspaceFolder}/src/index.ts",
       "cwd": "${workspaceFolder}",
-      "outFiles": [
-        "${workspaceFolder}/dist/**/*.js",
-        "!**/node_modules/**"
-      ],
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "env": {},
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"],
+      "env": {}
     }
   ]
 }

@@ -26,5 +26,15 @@
         "isDefault": true
       }
     },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "yarn test",
+      "dependsOn": "build",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    }
   ]
 }
