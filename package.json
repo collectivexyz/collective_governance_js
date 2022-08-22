@@ -1,6 +1,6 @@
 {
   "name": "collective_governance",
-  "version": "0.0.1",
+  "version": "0.2.1",
   "description": "smoke test for collective_governance",
   "main": "dist/index.js",
   "scripts": {

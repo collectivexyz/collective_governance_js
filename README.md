@@ -19,7 +19,7 @@ $ node dist/index.js
         "pid": 52385,
         "hostname": "080e1bc37852",
         "module": "/workspaces/collective_governance_js/dist/index.js",
-        "msg": "Wallet connected: 0x6CEb0bF1f28ca4165d5C0A04f61DC733987eD6ad"
+        "msg": "Wallet connected: XXXXXXXXX"
     },
     {
         "level": 30,
