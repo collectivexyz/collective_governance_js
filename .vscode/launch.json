@@ -7,8 +7,19 @@
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "index.ts",
-      "program": "${workspaceFolder}/src/index.ts",
+      "name": "simplevote.ts",
+      "program": "${workspaceFolder}/src/simplevote.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"],
+      "env": {}
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "create_governance.ts",
+      "program": "${workspaceFolder}/src/create_governance.ts",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],

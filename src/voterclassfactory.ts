@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: BSD-3-Clause
 /*
  * BSD 3-Clause License
  *
@@ -30,55 +29,48 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import * as dotenv from 'dotenv';
+import Web3 from 'web3';
+import { Contract, EventData } from 'web3-eth-contract';
+import { Wallet } from './wallet';
+import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
 
-dotenv.config();
+export class VoterClassFactory {
+  static ABI_NAME = 'VoterClassFactory.json';
 
-export class Config {
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
-  public readonly abiPath: string = process.env.ABI_PATH || '';
-  public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
-  public readonly voterClass: string = process.env.VOTER_CLASS || '';
-  public readonly contractAddress: string = process.env.CONTRACT_ADDRESS || '';
-  public readonly builderAddress: string = process.env.BUILDER_ADDRESS || '';
-  public readonly rpcUrl: string = process.env.RPC_URL || 'wss://localhost:8545';
-  public readonly privateKey: string = process.env.PRIVATE_KEY || '';
-  public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
-  public readonly gas: string = process.env.GAS || '470000';
-  constructor() {
-    if (!this.abiPath) {
-      throw new Error('ABI path required');
-    }
+  private contractAddress: string;
+  private wallet: Wallet;
+  private contractAbi: any[];
+  private contract: Contract;
+  private gas: number;
 
-    if (!this.voterFactory) {
-      throw new Error('Voter factory is required');
-    }
+  constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
+    this.contractAddress = contractAddress;
+    this.wallet = wallet;
+    this.gas = gas;
 
-    if (!this.builderAddress) {
-      throw new Error('Builder address required');
-    }
-
-    if (!this.contractAddress) {
-      this.logger.warn('Contract address is required for voting and proposals');
-    }
-
-    if (!this.rpcUrl) {
-      throw new Error('RPC url is required');
-    }
-
-    if (!this.privateKey) {
-      throw new Error('Wallet private key is required');
-    }
-
-    if (!this.tokenContract) {
-      throw new Error('Project address is required');
-    }
+    const abiFile = pathWithSlash(abiPath) + VoterClassFactory.ABI_NAME;
+    this.logger.info(`Loading ABI: ${abiFile}`);
+    this.contractAbi = loadAbi(abiFile);
+    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
+    this.contract.defaultAccount = web3.eth.defaultAccount;
+    this.logger.info(`Connected to contract ${this.contractAddress}`);
   }
 
-  public getGas(): number {
-    return parseInt(this.gas);
+  async createERC721(projectAddress: string, weight: number): Promise<string> {
+    this.logger.debug(`Sending createERC721 to ${projectAddress}`);
+    const tx = await this.contract.methods.createERC721(projectAddress, weight).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+    const event: EventData = tx.events['VoterClassCreated'];
+    const classAddress = event.returnValues['voterClass'];
+    if (classAddress) {
+      return classAddress;
+    }
+    throw new Error('Unknown VoterClass created');
   }
 }

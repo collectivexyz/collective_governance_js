@@ -31,23 +31,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import * as fs from 'fs';
+import Web3 from 'web3';
+import { Contract } from 'web3-eth-contract';
+import { loadAbi, pathWithSlash } from './abi';
+import { LoggerFactory } from './logging';
 
-export function loadAbi(abiFile: string): [] {
-  const abiData = fs.readFileSync(abiFile).toString();
-  return JSON.parse(abiData);
-}
+export class Storage {
+  static ABI_NAME = 'Storage.json';
 
-export function pathWithSlash(path: string): string {
-  if (path.endsWith('/')) {
-    return path;
+  private readonly logger = LoggerFactory.getLogger(module.filename);
+
+  private contractAddress: string;
+  private contractAbi: any[];
+  private contract: Contract;
+
+  constructor(abiPath: string, contractAddress: string, web3: Web3) {
+    this.contractAddress = contractAddress;
+    const abiFile = pathWithSlash(abiPath) + Storage.ABI_NAME;
+    this.logger.info(`Loading ABI: ${abiFile}`);
+    this.contractAbi = loadAbi(abiFile);
+    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
-  return path + '/';
-}
 
-export function getKeyAsEthereumKey(privateKey: string): string {
-  if (privateKey.startsWith('0x')) {
-    return privateKey;
+  async name(): Promise<string> {
+    const name = await this.contract.methods.name().call();
+    return name;
   }
-  return '0x' + privateKey;
+
+  async version(): Promise<number> {
+    const version = await this.contract.methods.version().call();
+    return version;
+  }
+
+  async quorumRequired(proposalId: number): Promise<number> {
+    return await this.contract.methods.quorumRequired(proposalId).call();
+  }
+
+  async voteDelay(proposalId: number): Promise<number> {
+    return await this.contract.methods.voteDelay(proposalId).call();
+  }
+
+  async voteDuration(proposalId: number): Promise<number> {
+    return await this.contract.methods.voteDuration(proposalId).call();
+  }
+
+  async startBlock(proposalId: number): Promise<number> {
+    return await this.contract.methods.startBlock(proposalId).call();
+  }
+
+  async endBlock(proposalId: number): Promise<number> {
+    return await this.contract.methods.endBlock(proposalId).call();
+  }
 }

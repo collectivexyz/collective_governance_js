@@ -18,7 +18,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "proposer",
+        "name": "sender",
         "type": "address"
       },
       {
@@ -55,11 +55,6 @@
         "internalType": "uint256",
         "name": "quorumThreshold",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "erc721",
-        "type": "address"
       },
       {
         "internalType": "uint256",

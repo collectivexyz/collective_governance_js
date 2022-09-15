@@ -31,23 +31,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import * as fs from 'fs';
+import Web3 from 'web3';
+import { Config } from './config';
+import { GovernanceBuilder } from './governancebuilder';
+import { VoterClassFactory } from './voterclassfactory';
+import { LoggerFactory } from './logging';
+import { EthWallet } from './wallet';
 
-export function loadAbi(abiFile: string): [] {
-  const abiData = fs.readFileSync(abiFile).toString();
-  return JSON.parse(abiData);
-}
+const logger = LoggerFactory.getLogger(module.filename);
 
-export function pathWithSlash(path: string): string {
-  if (path.endsWith('/')) {
-    return path;
+const run = async () => {
+  try {
+    const config = new Config();
+    const web3 = new Web3(config.rpcUrl);
+    const wallet = new EthWallet(config.privateKey, web3);
+    wallet.connect();
+    logger.info(`Wallet connected: ${wallet.getAddress()}`);
+
+    if (!config.voterClass) {
+      const voterClassFactory = new VoterClassFactory(config.abiPath, config.voterFactory, web3, wallet, config.getGas());
+
+      const classAddress = await voterClassFactory.createERC721(config.tokenContract, 1);
+      logger.info(`VoterClass created at ${classAddress}`);
+    } else {
+      const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
+      const name = await governanceBuilder.name();
+      logger.info(name);
+      await governanceBuilder.aGovernance();
+      await governanceBuilder.withSupervisor(wallet.getAddress());
+      await governanceBuilder.withVoterClassAddress(config.voterClass);
+      const governanceAddress = await governanceBuilder.build();
+      logger.info(`Governance contract created at ${governanceAddress}`);
+    }
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Run failed');
   }
-  return path + '/';
-}
+};
 
-export function getKeyAsEthereumKey(privateKey: string): string {
-  if (privateKey.startsWith('0x')) {
-    return privateKey;
-  }
-  return '0x' + privateKey;
-}
+run()
+  .then(() => process.exit(0))
+  .catch((error) => logger.error(error));
