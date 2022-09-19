@@ -135,7 +135,7 @@ export class CollectiveGovernance {
 
   async voteForWithTokenId(proposalId: number, tokenId: number): Promise<void> {
     this.logger.debug(`vote for with token: ${tokenId}`);
-    const voteTx = await this.strategy.methods.voteForWithTokenId(proposalId, tokenId).send({
+    const voteTx = await this.strategy.methods.voteFor(proposalId, tokenId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });

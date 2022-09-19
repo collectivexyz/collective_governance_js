@@ -104,10 +104,10 @@ export class GovernanceBuilder {
     this.logger.info(buildTx);
 
     const event: EventData = buildTx.events['GovernanceContractCreated'];
-    const governance = event.returnValues['_governance'];
+    const governance = event.returnValues['governance'];
     if (governance) {
       return governance;
     }
-    throw new Error('Unknown VoterClass created');
+    throw new Error('Unknown Governance created');
   }
 }

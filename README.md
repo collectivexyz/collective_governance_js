@@ -1,6 +1,11 @@
-# collective_governance example
+# Collective Governance TypeScript Reference
 
-### Getting Started
+# Getting Started
+
+### Gas Limit
+
+Be sure to set the gas limit for the operation you are performing.   The default limit 470000 is
+sufficient for many types of operations but construction and building operations may require 10x that.
 
 ## Create a Voter Class using VoterClass Builder
 
@@ -10,7 +15,17 @@
    This will run the GovernanceBuilder and create a governance contract for the specified VoterClass.
    Set the `CONTRACT_ADDRESS` in `.env`
 
-## Create a new vote using the `simplevote.ts`
+# Contract Deployments
+
+| Contract          | Ethereum Address                           | Description |
+| ----------------- | ------------------------------------------ | ------- |
+| VoterClass | 0xFC8711995314254897512Cb964A926E15965d531 | Class contract for 0xE3C82840FA0605a424Cc1ea6BC013D12909E4e69 enumerable contract   |
+| Governance | 0x603ae765e250F87bB6Abd38F6AC8371ce1A7d0C4 | Governance contract for 0xFC8711995314254897512Cb964A926E15965d531 voter class   |
+
+
+## Example
+
+A vote using the `simplevote.ts`:
 
 ```
 mr@080e1bc37852:/workspaces/collective_governance_js$ yarn start

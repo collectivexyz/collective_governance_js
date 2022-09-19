@@ -69,7 +69,6 @@ const run = async () => {
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = await governance.propose();
-    logger.info(`Token contract is ${config.tokenContract}`);
     await governance.configure(proposalId, 1, 5);
 
     const quorum = await storage.quorumRequired(proposalId);

@@ -49,11 +49,13 @@ const run = async () => {
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
 
     if (!config.voterClass) {
+      logger.info('Building VoterClass');
       const voterClassFactory = new VoterClassFactory(config.abiPath, config.voterFactory, web3, wallet, config.getGas());
 
       const classAddress = await voterClassFactory.createERC721(config.tokenContract, 1);
       logger.info(`VoterClass created at ${classAddress}`);
     } else {
+      logger.info('Building Governance Contract');
       const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
       const name = await governanceBuilder.name();
       logger.info(name);
