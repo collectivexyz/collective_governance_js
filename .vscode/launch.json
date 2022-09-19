@@ -5,26 +5,34 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "name": "simplevote.ts",
       "program": "${workspaceFolder}/src/simplevote.ts",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
-      "skipFiles": ["<node_internals>/**"],
-      "env": {}
+      "skipFiles": ["<node_internals>/**"]
     },
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "name": "create_governance.ts",
       "program": "${workspaceFolder}/src/create_governance.ts",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
-      "skipFiles": ["<node_internals>/**"],
-      "env": {}
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "create_voterclass.ts",
+      "program": "${workspaceFolder}/src/create_voterclass.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

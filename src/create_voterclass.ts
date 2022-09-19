@@ -33,7 +33,7 @@
 
 import Web3 from 'web3';
 import { Config } from './config';
-import { GovernanceBuilder } from './governancebuilder';
+import { VoterClassFactory } from './voterclassfactory';
 import { LoggerFactory } from './logging';
 import { EthWallet } from './wallet';
 
@@ -46,15 +46,12 @@ const run = async () => {
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    logger.info('Building Governance Contract');
-    const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const name = await governanceBuilder.name();
-    logger.info(name);
-    await governanceBuilder.aGovernance();
-    await governanceBuilder.withSupervisor(wallet.getAddress());
-    await governanceBuilder.withVoterClassAddress(config.voterClass);
-    const governanceAddress = await governanceBuilder.build();
-    logger.info(`Governance contract created at ${governanceAddress}`);
+
+    logger.info('Building VoterClass');
+    const voterClassFactory = new VoterClassFactory(config.abiPath, config.voterFactory, web3, wallet, config.getGas());
+
+    const classAddress = await voterClassFactory.createERC721(config.tokenContract, 1);
+    logger.info(`VoterClass created at ${classAddress}`);
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');
