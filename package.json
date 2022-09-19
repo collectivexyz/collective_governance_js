@@ -1,6 +1,6 @@
 {
   "name": "collective_governance",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Collective Governance JavaScript Reference",
   "main": "dist/index.js",
   "scripts": {
