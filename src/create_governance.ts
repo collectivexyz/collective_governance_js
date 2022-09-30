@@ -53,6 +53,7 @@ const run = async () => {
     await governanceBuilder.aGovernance();
     await governanceBuilder.withSupervisor(wallet.getAddress());
     await governanceBuilder.withVoterClassAddress(config.voterClass);
+    await governanceBuilder.withMinimumDuration(config.getMinimumDuration());
     const governanceAddress = await governanceBuilder.build();
     logger.info(`Governance contract created at ${governanceAddress}`);
   } catch (error) {

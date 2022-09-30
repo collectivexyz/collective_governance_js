@@ -75,11 +75,11 @@ export class Storage {
     return await this.contract.methods.voteDuration(proposalId).call();
   }
 
-  async startBlock(proposalId: number): Promise<number> {
-    return await this.contract.methods.startBlock(proposalId).call();
+  async startTime(proposalId: number): Promise<number> {
+    return await this.contract.methods.startTime(proposalId).call();
   }
 
-  async endBlock(proposalId: number): Promise<number> {
-    return await this.contract.methods.endBlock(proposalId).call();
+  async endTime(proposalId: number): Promise<number> {
+    return await this.contract.methods.endTime(proposalId).call();
   }
 }

@@ -4,8 +4,9 @@
   "description": "Collective Governance JavaScript Reference",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/simplevote.js",
+    "simple": "node dist/simplevote.js",
     "create_governance": "node dist/create_governance.js",
+    "create_voterclass": "node dist/create_voterclass.js",
     "build": "tsc",
     "prettier:check": "prettier --check **/*.ts",
     "prettier:write": "prettier --write **/*.ts **/*.ts",

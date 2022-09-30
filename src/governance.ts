@@ -93,9 +93,9 @@ export class CollectiveGovernance {
     throw new Error('Unknown proposal created');
   }
 
-  async configure(proposalId: number, quorum: number, requiredDuration: number): Promise<void> {
+  async configure(proposalId: number, quorum: number): Promise<void> {
     this.logger.debug('configure vote.');
-    const configureTx = await this.contract.methods.configure(proposalId, quorum, requiredDuration).send({
+    const configureTx = await this.contract.methods.configure(proposalId, quorum).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });
@@ -118,6 +118,15 @@ export class CollectiveGovernance {
   async endVote(proposalId: number): Promise<void> {
     this.logger.debug('end vote.');
     const endTx = await this.strategy.methods.endVote(proposalId).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(endTx);
+  }
+
+  async cancel(proposalId: number): Promise<void> {
+    this.logger.debug(`cancel: ${proposalId}`);
+    const endTx = await this.strategy.methods.cancel(proposalId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });

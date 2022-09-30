@@ -72,7 +72,7 @@
         "type": "uint256"
       }
     ],
-    "name": "SetQuorumThreshold",
+    "name": "SetQuorumRequired",
     "type": "event"
   },
   {
@@ -131,6 +131,25 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "supervisor",
+        "type": "address"
+      }
+    ],
+    "name": "VoteCancel",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "voter",
         "type": "address"
       },
@@ -162,13 +181,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "startBlock",
+        "name": "startTime",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "endBlock",
+        "name": "endTime",
         "type": "uint256"
       }
     ],
@@ -297,6 +316,24 @@
         "type": "address"
       }
     ],
+    "name": "cancel",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_sender",
+        "type": "address"
+      }
+    ],
     "name": "enableUndoVote",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -310,7 +347,7 @@
         "type": "uint256"
       }
     ],
-    "name": "endBlock",
+    "name": "endTime",
     "outputs": [
       {
         "internalType": "uint256",
@@ -386,7 +423,26 @@
         "type": "uint256"
       }
     ],
-    "name": "isReady",
+    "name": "isCancel",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "isFinal",
     "outputs": [
       {
         "internalType": "bool",
@@ -418,7 +474,7 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -461,7 +517,7 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -496,7 +552,7 @@
         "type": "address"
       }
     ],
-    "name": "makeReady",
+    "name": "makeFinal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -512,6 +568,19 @@
       }
     ],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minimumVoteDuration",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -594,21 +663,11 @@
         "internalType": "uint256",
         "name": "_proposalId",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_passThreshold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_sender",
-        "type": "address"
       }
     ],
-    "name": "setQuorumThreshold",
+    "name": "revertNotValid",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -620,7 +679,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_voteDuration",
+        "name": "_quorum",
         "type": "uint256"
       },
       {
@@ -629,7 +688,7 @@
         "type": "address"
       }
     ],
-    "name": "setRequiredVoteDuration",
+    "name": "setQuorumRequired",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -663,14 +722,56 @@
         "internalType": "uint256",
         "name": "_proposalId",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_voteDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_sender",
+        "type": "address"
       }
     ],
-    "name": "startBlock",
+    "name": "setVoteDuration",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "startTime",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -703,19 +804,6 @@
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "validOrRevert",
-    "outputs": [],
-    "stateMutability": "view",
     "type": "function"
   },
   {

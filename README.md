@@ -9,7 +9,7 @@ sufficient for many types of operations but construction and building operations
 
 ## Create a Voter Class using VoterClass Builder
 
-1. Set VOTER_FACTORY in `.env` and run `yarn create_governance`
+1. Set VOTER_FACTORY in `.env` and run `yarn create_voterclass`
 2. The VoterClass address is stored in the voterClass parameter of the `VoterClassCreated` event
 3. Add the VoterClass address to the `.env` and run `yarn create_governance`
    This will run the GovernanceBuilder and create a governance contract for the specified VoterClass.

@@ -48,6 +48,8 @@ export class Config {
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
   public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
   public readonly gas: string = process.env.GAS || '470000';
+  public readonly minimumDuration: string = process.env.MINIMUM_DURATION || '86400';
+
   constructor() {
     if (!this.abiPath) {
       throw new Error('ABI path required');
@@ -80,5 +82,9 @@ export class Config {
 
   public getGas(): number {
     return parseInt(this.gas);
+  }
+
+  public getMinimumDuration(): number {
+    return parseInt(this.minimumDuration);
   }
 }

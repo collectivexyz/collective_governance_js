@@ -95,6 +95,16 @@ export class GovernanceBuilder {
     return this;
   }
 
+  async withMinimumDuration(duration: number): Promise<GovernanceBuilder> {
+    this.logger.info(`withMinimumDuration ${duration}`);
+    const tx = await this.contract.methods.withMinimumDuration(duration).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+    return this;
+  }
+
   async build(): Promise<string> {
     this.logger.info('Building Governance');
     const buildTx = await this.contract.methods.build().send({

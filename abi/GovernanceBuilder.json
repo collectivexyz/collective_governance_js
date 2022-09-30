@@ -28,12 +28,12 @@
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "supervisor",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "duration",
+        "type": "uint256"
       }
     ],
-    "name": "BuilderSupervisorAdded",
+    "name": "BuilderWithMinimumDuration",
     "type": "event"
   },
   {
@@ -43,6 +43,50 @@
         "indexed": false,
         "internalType": "address",
         "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_storage",
+        "type": "address"
+      }
+    ],
+    "name": "BuilderWithStorageAddress",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "supervisor",
+        "type": "address"
+      }
+    ],
+    "name": "BuilderWithSupervisor",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "class",
         "type": "address"
       },
       {
@@ -58,7 +102,7 @@
         "type": "uint32"
       }
     ],
-    "name": "BuilderVoterClassAdded",
+    "name": "BuilderWithVoterClass",
     "type": "event"
   },
   {
@@ -95,23 +139,10 @@
   },
   {
     "inputs": [],
-    "name": "VERSION_1",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "aGovernance",
     "outputs": [
       {
-        "internalType": "contract GovernanceBuilder",
+        "internalType": "contract Builder",
         "name": "",
         "type": "address"
       }
@@ -147,6 +178,32 @@
   },
   {
     "inputs": [],
+    "name": "reset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "version",
     "outputs": [
       {
@@ -156,6 +213,25 @@
       }
     ],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minimumDuration",
+        "type": "uint256"
+      }
+    ],
+    "name": "withMinimumDuration",
+    "outputs": [
+      {
+        "internalType": "contract Builder",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

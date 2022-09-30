@@ -40,6 +40,10 @@ import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
+function timeNow(): number {
+  return Math.floor(Date.now() / 1000);
+}
+
 async function timeout(duration: number): Promise<void> {
   return new Promise<void>((resolve) => {
     setTimeout(resolve, duration);
@@ -69,19 +73,17 @@ const run = async () => {
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = await governance.propose();
-    await governance.configure(proposalId, 1, 5);
+    await governance.configure(proposalId, 1);
 
     const quorum = await storage.quorumRequired(proposalId);
     const duration = await storage.voteDuration(proposalId);
 
     logger.info(`New Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
 
-    const startBlock = await storage.startBlock(proposalId);
-    let blockNumber = await web3.eth.getBlockNumber();
-    while (blockNumber < startBlock) {
+    const startTime = await storage.startTime(proposalId);
+    while (timeNow() < startTime) {
       logger.info('Waiting for start ...');
-      await timeout(2000 * startBlock - blockNumber);
-      blockNumber = await web3.eth.getBlockNumber();
+      await timeout((startTime - timeNow()) * 1000);
     }
 
     await governance.openVote(proposalId);
@@ -92,13 +94,12 @@ const run = async () => {
 
     let voteStatus = await governance.isOpen(proposalId);
     while (voteStatus) {
-      const endBlock = await storage.endBlock(proposalId);
-      blockNumber = await web3.eth.getBlockNumber();
-      while (blockNumber < endBlock) {
-        const sleepFor = 2000 * (endBlock - blockNumber);
+      const endTime = await storage.endTime(proposalId);
+      let sleepFor = endTime - timeNow();
+      while (sleepFor > 0) {
         logger.info(`Voting in progress...sleeping for ${sleepFor}`);
-        await timeout(sleepFor);
-        blockNumber = await web3.eth.getBlockNumber();
+        await timeout(sleepFor * 1000);
+        sleepFor = endTime - timeNow();
       }
       voteStatus = await governance.isOpen(proposalId);
     }
