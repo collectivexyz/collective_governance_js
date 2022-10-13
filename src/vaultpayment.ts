@@ -50,6 +50,12 @@ async function timeout(duration: number): Promise<void> {
   });
 }
 
+// this shows an example of configuring a vault with
+// an attached payment
+
+// this example is using this example contract to management payments
+// https://github.com/jac18281828/transfervault
+
 const run = async () => {
   try {
     const config = new Config();
@@ -73,6 +79,22 @@ const run = async () => {
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = await governance.propose();
+
+    if (!config.vaultContract) {
+      throw Error('Vault not configured');
+    }
+
+    const etaOfLock = timeNow() + config.getMinimumDuration();
+
+    await governance.attachTransaction(
+      proposalId,
+      config.vaultContract,
+      config.getVaultValue(),
+      config.vaultSignature,
+      config.vaultCalldata,
+      etaOfLock
+    );
+
     await governance.configure(proposalId, 1);
 
     const quorum = await storage.quorumRequired(proposalId);
@@ -97,11 +119,17 @@ const run = async () => {
       const endTime = await storage.endTime(proposalId);
       let sleepFor = endTime - timeNow();
       while (sleepFor > 0) {
-        logger.info(`Voting in progress...sleeping for ${sleepFor}`);
+        logger.info(`Voting in progress... sleeping for ${sleepFor}`);
         await timeout(sleepFor * 1000);
         sleepFor = endTime - timeNow();
       }
       voteStatus = await governance.isOpen(proposalId);
+    }
+
+    while (timeNow() < etaOfLock) {
+      const remainingTime = etaOfLock - timeNow();
+      logger.info(`Awaiting timeLock... sleeping for ${remainingTime}`);
+      await timeout(remainingTime * 1000);
     }
 
     await governance.endVote(proposalId);

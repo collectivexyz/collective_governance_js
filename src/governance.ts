@@ -79,7 +79,7 @@ export class CollectiveGovernance {
   }
 
   async propose(): Promise<number> {
-    this.logger.debug('Propose new vote.');
+    this.logger.debug('Propose new vote');
     const proposeTx = await this.contract.methods.propose().send({
       from: this.wallet.getAddress(),
       gas: this.gas,
@@ -93,8 +93,26 @@ export class CollectiveGovernance {
     throw new Error('Unknown proposal created');
   }
 
+  async attachTransaction(
+    proposalId: number,
+    target: string,
+    value: number,
+    signature: string,
+    calldata: string,
+    etaOfLock: number
+  ): Promise<void> {
+    this.logger.debug(`attach: ${proposalId}, ${target}, ${value}, ${signature}, ${calldata}, ${etaOfLock}`);
+    const attachTx = await this.contract.methods
+      .attachTransaction(proposalId, target, value, signature, calldata, etaOfLock)
+      .send({
+        from: this.wallet.getAddress(),
+        gas: this.gas,
+      });
+    this.logger.info(attachTx);
+  }
+
   async configure(proposalId: number, quorum: number): Promise<void> {
-    this.logger.debug('configure vote.');
+    this.logger.debug('configure vote');
     const configureTx = await this.contract.methods.configure(proposalId, quorum).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
@@ -106,9 +124,9 @@ export class CollectiveGovernance {
     return await this.strategy.methods.isOpen(proposalId).call();
   }
 
-  async openVote(proposalId: number): Promise<void> {
-    this.logger.debug('open vote.');
-    const openTx = await this.strategy.methods.openVote(proposalId).send({
+  async startVote(proposalId: number): Promise<void> {
+    this.logger.debug('start vote');
+    const openTx = await this.strategy.methods.startVote(proposalId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });
@@ -116,7 +134,7 @@ export class CollectiveGovernance {
   }
 
   async endVote(proposalId: number): Promise<void> {
-    this.logger.debug('end vote.');
+    this.logger.debug('end vote');
     const endTx = await this.strategy.methods.endVote(proposalId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,

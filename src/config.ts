@@ -47,6 +47,10 @@ export class Config {
   public readonly rpcUrl: string = process.env.RPC_URL || 'wss://localhost:8545';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
   public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
+  public readonly vaultContract: string = process.env.VAULT_CONTRACT || '';
+  public readonly vaultValue: string = process.env.VAULT_VALUE || '';
+  public readonly vaultSignature: string = process.env.VAULT_SIGNATURE || '';
+  public readonly vaultCalldata: string = process.env.VAULT_CALLDATA || '';
   public readonly gas: string = process.env.GAS || '470000';
   public readonly minimumDuration: string = process.env.MINIMUM_DURATION || '86400';
 
@@ -86,5 +90,9 @@ export class Config {
 
   public getMinimumDuration(): number {
     return parseInt(this.minimumDuration);
+  }
+
+  public getVaultValue(): number {
+    return this.vaultValue ? parseInt(this.vaultValue) : 0;
   }
 }
