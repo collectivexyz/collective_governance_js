@@ -19,8 +19,8 @@ sufficient for many types of operations but construction and building operations
 
 | Contract   | Ethereum Address                           | Description                                                                       |
 | ---------- | ------------------------------------------ | --------------------------------------------------------------------------------- |
-| VoterClass | 0x7abF1F8640e1DFc67Cf379080dCcC8F8c03C77FE | Class contract for 0xE3C82840FA0605a424Cc1ea6BC013D12909E4e69 enumerable contract |
-| Governance | 0xaFA967aef5797e2CCa6955693ccc77542A174197 | Governance contract for 0x7abF1F8640e1DFc67Cf379080dCcC8F8c03C77FE voter class    |
+| VoterClass | 0x491073195721a990A0b13e881394c8846985BCc1 | Class contract for 0xE3C82840FA0605a424Cc1ea6BC013D12909E4e69 enumerable contract |
+| Governance | 0xD6C840Ac9FfE0775746236584DCbC60c5693b411 | Governance contract for 0x491073195721a990A0b13e881394c8846985BCc1 voter class    |
 
 ## Example
 

@@ -84,7 +84,8 @@ const run = async () => {
       throw Error('Vault not configured');
     }
 
-    const etaOfLock = timeNow() + config.getMinimumDuration();
+    // add 10 minutes to ensure eta is within allowable lock range
+    const etaOfLock = timeNow() + config.getMinimumDuration() + 10 * 60;
 
     await governance.attachTransaction(
       proposalId,
