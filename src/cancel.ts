@@ -36,23 +36,16 @@ import { Config } from './config';
 import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
 import { Storage } from './storage';
-import { timeNow, timeout } from './time';
 import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
-
-// this shows an example of configuring a vault with
-// an attached payment
-
-// this example is using this example contract to management payments
-// https://github.com/jac18281828/transfervault
 
 const run = async () => {
   try {
     const config = new Config();
     const web3 = new Web3(config.rpcUrl);
 
-    logger.info(`Governance Started`);
+    logger.info(`Cancel Existing Proposal`);
 
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
@@ -63,8 +56,7 @@ const run = async () => {
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
-    const communityHex = await governance.community();
-    const community = web3.utils.hexToAscii(communityHex);
+    const community = await governance.community();
     logger.info(`Community: ${community}`);
     const url = await governance.url();
     logger.info(`Community Url: ${url}`);
@@ -72,72 +64,18 @@ const run = async () => {
     logger.info(`Description: ${description}`);
 
     const storageAddress = await governance.getStorageAddress();
-    const storage = new Storage(config.abiPath, storageAddress, web3, wallet, config.getGas());
+    const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);
 
-    const proposalId = await governance.propose();
-
-    if (!config.vaultContract) {
-      throw Error('Vault not configured');
-    }
-
-    // add 10 minutes to ensure eta is within allowable lock range
-    const etaOfLock = timeNow() + config.getMinimumDuration() + 10 * 60;
-
-    await governance.attachTransaction(
-      proposalId,
-      config.vaultContract,
-      config.getVaultValue(),
-      config.vaultSignature,
-      config.vaultCalldata,
-      etaOfLock
-    );
-
-    await governance.configure(proposalId, 1);
-
-    const quorum = await storage.quorumRequired(proposalId);
-    const duration = await storage.voteDuration(proposalId);
-
-    logger.info(`New Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
-
-    const startTime = await storage.startTime(proposalId);
-    while (timeNow() < startTime) {
-      logger.info('Waiting for start ...');
-      await timeout((startTime - timeNow()) * 1000);
-    }
-
-    await governance.startVote(proposalId);
-    logger.info('Voting started...');
-
-    // voting shares
-    await governance.voteFor(proposalId);
-
-    let voteStatus = await governance.isOpen(proposalId);
-    while (voteStatus) {
-      const endTime = await storage.endTime(proposalId);
-      let sleepFor = endTime - timeNow();
-      while (sleepFor > 0) {
-        logger.info(`Voting in progress... sleeping for ${sleepFor}`);
-        await timeout(sleepFor * 1000);
-        sleepFor = endTime - timeNow();
-      }
-      voteStatus = await governance.isOpen(proposalId);
-    }
-
-    while (timeNow() < etaOfLock) {
-      const remainingTime = etaOfLock - timeNow();
-      logger.info(`Awaiting timeLock... sleeping for ${remainingTime}`);
-      await timeout(remainingTime * 1000);
-    }
-
-    await governance.endVote(proposalId);
-    const measurePassed = await governance.voteSucceeded(proposalId);
-    if (measurePassed) {
-      logger.info('The measure has passed');
+    const proposalId = config.getProposalId();
+    await governance.cancel(proposalId);
+    const voteStatus = await governance.isOpen(proposalId);
+    if (!voteStatus) {
+      logger.info('Vote closed');
     } else {
-      logger.info('The measure has failed');
+      logger.info('Vote not cancelled');
     }
   } catch (error) {
     logger.error(error);

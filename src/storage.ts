@@ -2,7 +2,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright (c) 2022, Collective.XYZ
+ * Copyright (c) 2022, collective
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
  */
 
 import Web3 from 'web3';
+import { Wallet } from './wallet';
 import { Contract } from 'web3-eth-contract';
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
@@ -61,6 +62,14 @@ export class Storage {
   async version(): Promise<number> {
     const version = await this.contract.methods.version().call();
     return version;
+  }
+
+  async description(proposalId: number): Promise<string> {
+    return await this.contract.methods.description(proposalId).call();
+  }
+
+  async url(proposalId: number): Promise<string> {
+    return await this.contract.methods.description(proposalId).call();
   }
 
   async quorumRequired(proposalId: number): Promise<number> {

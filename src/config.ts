@@ -2,7 +2,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright (c) 2022, Collective.XYZ
+ * Copyright (c) 2022, collective
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,6 +53,7 @@ export class Config {
   public readonly vaultCalldata: string = process.env.VAULT_CALLDATA || '';
   public readonly gas: string = process.env.GAS || '470000';
   public readonly minimumDuration: string = process.env.MINIMUM_DURATION || '86400';
+  public readonly proposalId: string = process.env.PROPOSAL_ID || '';
 
   constructor() {
     if (!this.abiPath) {
@@ -94,5 +95,9 @@ export class Config {
 
   public getVaultValue(): number {
     return this.vaultValue ? parseInt(this.vaultValue) : 0;
+  }
+
+  public getProposalId(): number {
+    return parseInt(this.proposalId);
   }
 }

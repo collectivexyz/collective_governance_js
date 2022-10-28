@@ -2,7 +2,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright (c) 2022, Collective.XYZ
+ * Copyright (c) 2022, collective
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ import Web3 from 'web3';
 import { Config } from './config';
 import { GovernanceBuilder } from './governancebuilder';
 import { LoggerFactory } from './logging';
+import { timeNow } from './time';
 import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
@@ -50,7 +51,14 @@ const run = async () => {
     const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
     const name = await governanceBuilder.name();
     logger.info(name);
+
     await governanceBuilder.aGovernance();
+    const encodedName = web3.utils.asciiToHex(`Simple Vote Example @${timeNow()}`);
+    await governanceBuilder.withName(encodedName);
+    await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
+    await governanceBuilder.withDescription(
+      'Example configuration of Collective Governance contract.   Created by collective_governance_js.'
+    );
     await governanceBuilder.withSupervisor(wallet.getAddress());
     await governanceBuilder.withVoterClassAddress(config.voterClass);
     await governanceBuilder.withMinimumDuration(config.getMinimumDuration());

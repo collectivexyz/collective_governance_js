@@ -2,7 +2,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright (c) 2022, Collective.XYZ
+ * Copyright (c) 2022, collective
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -203,6 +203,18 @@ export class CollectiveGovernance {
       gas: this.gas,
     });
     this.logger.info(voteTx);
+  }
+
+  async community(): Promise<string> {
+    return await this.contract.methods.community().call();
+  }
+
+  async url(): Promise<string> {
+    return await this.contract.methods.url().call();
+  }
+
+  async description(): Promise<string> {
+    return await this.contract.methods.description().call();
   }
 
   async voteSucceeded(proposalId: number): Promise<boolean> {

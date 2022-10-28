@@ -2,7 +2,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright (c) 2022, Collective.XYZ
+ * Copyright (c) 2022, collective
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,19 +36,10 @@ import { Config } from './config';
 import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
 import { Storage } from './storage';
+import { timeNow, timeout } from './time';
 import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
-
-function timeNow(): number {
-  return Math.floor(Date.now() / 1000);
-}
-
-async function timeout(duration: number): Promise<void> {
-  return new Promise<void>((resolve) => {
-    setTimeout(resolve, duration);
-  });
-}
 
 const run = async () => {
   try {
@@ -66,8 +57,16 @@ const run = async () => {
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
+    const communityHex = await governance.community();
+    const community = web3.utils.hexToAscii(communityHex);
+    logger.info(`Community: ${community}`);
+    const url = await governance.url();
+    logger.info(`Community Url: ${url}`);
+    const description = await governance.description();
+    logger.info(`Description: ${description}`);
+
     const storageAddress = await governance.getStorageAddress();
-    const storage = new Storage(config.abiPath, storageAddress, web3);
+    const storage = new Storage(config.abiPath, storageAddress, web3, wallet, config.getGas());
     const storageName = await storage.name();
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);

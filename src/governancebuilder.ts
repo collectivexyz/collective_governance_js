@@ -2,7 +2,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright (c) 2022, Collective.XYZ
+ * Copyright (c) 2022, collective
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,6 +68,36 @@ export class GovernanceBuilder {
   async aGovernance(): Promise<GovernanceBuilder> {
     this.logger.info('Governance Builder Started');
     const tx = await this.contract.methods.aGovernance().send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+    return this;
+  }
+
+  async withName(name: string): Promise<GovernanceBuilder> {
+    this.logger.info(`withName ${name}`);
+    const tx = await this.contract.methods.withName(name).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+    return this;
+  }
+
+  async withUrl(url: string): Promise<GovernanceBuilder> {
+    this.logger.info(`withUrl ${url}`);
+    const tx = await this.contract.methods.withUrl(url).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+    return this;
+  }
+
+  async withDescription(desc: string): Promise<GovernanceBuilder> {
+    this.logger.info(`withDescription ${desc}`);
+    const tx = await this.contract.methods.withDescription(desc).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });
