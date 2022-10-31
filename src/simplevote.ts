@@ -57,21 +57,26 @@ const run = async () => {
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
-    const communityHex = await governance.community();
-    const community = web3.utils.hexToAscii(communityHex);
+    const community = await governance.community();
     logger.info(`Community: ${community}`);
-    const url = await governance.url();
-    logger.info(`Community Url: ${url}`);
+    const communityUrl = await governance.url();
+    logger.info(`Community Url: ${communityUrl}`);
     const description = await governance.description();
     logger.info(`Description: ${description}`);
 
     const storageAddress = await governance.getStorageAddress();
-    const storage = new Storage(config.abiPath, storageAddress, web3, wallet, config.getGas());
+    const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = await governance.propose();
+    await governance.describe(
+      proposalId,
+      'This is a demo vote on Collective Governance Contract',
+      'https://github.com/collectivexyz/collective_governance_js'
+    );
+    const metaId = await governance.addMeta(proposalId, 'vote_time', new Date().toISOString());
     await governance.configure(proposalId, 1);
 
     const quorum = await storage.quorumRequired(proposalId);
@@ -91,6 +96,15 @@ const run = async () => {
     // voting shares
     await governance.voteFor(proposalId);
 
+    const desc = await storage.description(proposalId);
+    logger.info(`Description: ${desc}`);
+
+    const url = await storage.url(proposalId);
+    logger.info(`Url: ${url}`);
+
+    const metaData = await storage.getMeta(proposalId, metaId);
+    logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
+
     let voteStatus = await governance.isOpen(proposalId);
     while (voteStatus) {
       const endTime = await storage.endTime(proposalId);
@@ -104,6 +118,7 @@ const run = async () => {
     }
 
     await governance.endVote(proposalId);
+
     const measurePassed = await governance.voteSucceeded(proposalId);
     if (measurePassed) {
       logger.info('The measure has passed');

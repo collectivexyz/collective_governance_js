@@ -72,7 +72,7 @@ const run = async () => {
     logger.info(`Description: ${description}`);
 
     const storageAddress = await governance.getStorageAddress();
-    const storage = new Storage(config.abiPath, storageAddress, web3, wallet, config.getGas());
+    const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);

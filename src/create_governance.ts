@@ -53,8 +53,8 @@ const run = async () => {
     logger.info(name);
 
     await governanceBuilder.aGovernance();
-    const encodedName = web3.utils.asciiToHex(`Simple Vote Example @${timeNow()}`);
-    await governanceBuilder.withName(encodedName);
+
+    await governanceBuilder.withName(`Simple Vote Example @${timeNow()}`);
     await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
     await governanceBuilder.withDescription(
       'Example configuration of Collective Governance contract.   Created by collective_governance_js.'

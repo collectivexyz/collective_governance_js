@@ -43,6 +43,7 @@ export class GovernanceBuilder {
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
   private contractAddress: string;
+  private web3: Web3;
   private wallet: Wallet;
   private contractAbi: any[];
   private contract: Contract;
@@ -50,6 +51,7 @@ export class GovernanceBuilder {
 
   constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
     this.contractAddress = contractAddress;
+    this.web3 = web3;
     this.wallet = wallet;
     this.gas = gas;
 
@@ -77,7 +79,8 @@ export class GovernanceBuilder {
 
   async withName(name: string): Promise<GovernanceBuilder> {
     this.logger.info(`withName ${name}`);
-    const tx = await this.contract.methods.withName(name).send({
+    const encodedName = this.web3.utils.asciiToHex(name);
+    const tx = await this.contract.methods.withName(encodedName).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });

@@ -32,7 +32,6 @@
  */
 
 import Web3 from 'web3';
-import { Wallet } from './wallet';
 import { Contract } from 'web3-eth-contract';
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
@@ -43,11 +42,13 @@ export class Storage {
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
   private contractAddress: string;
+  private web3: Web3;
   private contractAbi: any[];
   private contract: Contract;
 
   constructor(abiPath: string, contractAddress: string, web3: Web3) {
     this.contractAddress = contractAddress;
+    this.web3 = web3;
     const abiFile = pathWithSlash(abiPath) + Storage.ABI_NAME;
     this.logger.info(`Loading ABI: ${abiFile}`);
     this.contractAbi = loadAbi(abiFile);
@@ -70,6 +71,12 @@ export class Storage {
 
   async url(proposalId: number): Promise<string> {
     return await this.contract.methods.description(proposalId).call();
+  }
+
+  async getMeta(proposalId: number, metaId: number): Promise<{ name: string; value: string }> {
+    const metaData = await this.contract.methods.getMeta(proposalId, metaId).call();
+    const decodedName = this.web3.utils.hexToAscii(metaData[0]);
+    return { name: decodedName, value: metaData[1] };
   }
 
   async quorumRequired(proposalId: number): Promise<number> {

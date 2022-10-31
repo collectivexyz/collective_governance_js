@@ -44,6 +44,7 @@ export class CollectiveGovernance {
   static STRAT_NAME = 'VoteStrategy.json';
 
   private contractAddress: string;
+  private web3: Web3;
   private wallet: Wallet;
   private contractAbi: any[];
   private contract: Contract;
@@ -53,6 +54,7 @@ export class CollectiveGovernance {
 
   constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
     this.contractAddress = contractAddress;
+    this.web3 = web3;
     this.wallet = wallet;
     this.gas = gas;
 
@@ -93,6 +95,28 @@ export class CollectiveGovernance {
     throw new Error('Unknown proposal created');
   }
 
+  async describe(proposalId: number, description: string, url: string): Promise<void> {
+    this.logger.debug(`describe: ${proposalId}, ${description}, ${url}`);
+    const tx = await this.contract.methods.describe(proposalId, description, url).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+  }
+
+  async addMeta(proposalId: number, name: string, value: string): Promise<number> {
+    this.logger.debug(`addMeta: ${proposalId}, ${name}, ${value}`);
+    const encodedName = this.web3.utils.asciiToHex(name);
+    const tx = await this.contract.methods.addMeta(proposalId, encodedName, value).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+    const event: EventData = tx.events['ProposalMeta'];
+    const metaId = parseInt(event.returnValues['metaId']);
+    return metaId;
+  }
+
   async attachTransaction(
     proposalId: number,
     target: string,
@@ -100,7 +124,7 @@ export class CollectiveGovernance {
     signature: string,
     calldata: string,
     etaOfLock: number
-  ): Promise<void> {
+  ): Promise<number> {
     this.logger.debug(`attach: ${proposalId}, ${target}, ${value}, ${signature}, ${calldata}, ${etaOfLock}`);
     const attachTx = await this.contract.methods
       .attachTransaction(proposalId, target, value, signature, calldata, etaOfLock)
@@ -109,6 +133,9 @@ export class CollectiveGovernance {
         gas: this.gas,
       });
     this.logger.info(attachTx);
+    const event: EventData = attachTx.events['ProposalTransactionAttached'];
+    const transactionId = parseInt(event.returnValues['transactionId']);
+    return transactionId;
   }
 
   async configure(proposalId: number, quorum: number): Promise<void> {
@@ -206,7 +233,9 @@ export class CollectiveGovernance {
   }
 
   async community(): Promise<string> {
-    return await this.contract.methods.community().call();
+    const communityHexEnc = await this.contract.methods.community().call();
+    const community = this.web3.utils.hexToAscii(communityHexEnc);
+    return community;
   }
 
   async url(): Promise<string> {
