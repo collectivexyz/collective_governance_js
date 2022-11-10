@@ -54,10 +54,10 @@ const run = async () => {
 
     await governanceBuilder.aGovernance();
 
-    await governanceBuilder.withName(`Simple Vote Example @${timeNow()}`);
+    await governanceBuilder.withName(`Collective Vote @${timeNow()}`);
     await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
     await governanceBuilder.withDescription(
-      'Example configuration of Collective Governance contract.   Created by collective_governance_js.'
+      'Configuration of Collective Governance contract.   Created by collective_governance_js.'
     );
     await governanceBuilder.withSupervisor(wallet.getAddress());
     await governanceBuilder.withVoterClassAddress(config.voterClass);

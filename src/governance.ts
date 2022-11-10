@@ -95,6 +95,31 @@ export class CollectiveGovernance {
     throw new Error('Unknown proposal created');
   }
 
+  async choiceVote(choiceCount: number): Promise<number> {
+    this.logger.debug(`Propose choice vote: ${choiceCount}`);
+    const proposeTx = await this.contract.methods.propose(choiceCount).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(proposeTx);
+    const event: EventData = proposeTx.events['ProposalCreated'];
+    const proposalId = parseInt(event.returnValues['proposalId']);
+    if (proposalId) {
+      return proposalId;
+    }
+    throw new Error('Unknown proposal created');
+  }
+
+  async setChoice(proposalId: number, choiceId: number, name: string, description: string, transactionId: number): Promise<void> {
+    this.logger.info(`choice: ${proposalId}, ${choiceId}, ${name}, ${description}, ${transactionId}}`);
+    const encodedName = this.web3.utils.asciiToHex(name);
+    const tx = await this.contract.methods.setChoice(proposalId, choiceId, encodedName, description, transactionId).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(tx);
+  }
+
   async describe(proposalId: number, description: string, url: string): Promise<void> {
     this.logger.debug(`describe: ${proposalId}, ${description}, ${url}`);
     const tx = await this.contract.methods.describe(proposalId, description, url).send({
@@ -147,6 +172,15 @@ export class CollectiveGovernance {
     this.logger.info(configureTx);
   }
 
+  async configureDelay(proposalId: number, quorum: number, requiredDelay: number, requiredDuration: number): Promise<void> {
+    this.logger.debug('configure vote');
+    const configureTx = await this.contract.methods.configure(proposalId, quorum, requiredDelay, requiredDuration).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(configureTx);
+  }
+
   async isOpen(proposalId: number): Promise<boolean> {
     return await this.strategy.methods.isOpen(proposalId).call();
   }
@@ -171,7 +205,7 @@ export class CollectiveGovernance {
 
   async cancel(proposalId: number): Promise<void> {
     this.logger.debug(`cancel: ${proposalId}`);
-    const endTx = await this.strategy.methods.cancel(proposalId).send({
+    const endTx = await this.contract.methods.cancel(proposalId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });
@@ -179,8 +213,17 @@ export class CollectiveGovernance {
   }
 
   async voteFor(proposalId: number): Promise<void> {
-    this.logger.debug('vote for');
+    this.logger.debug(`vote for: ${proposalId}`);
     const voteTx = await this.strategy.methods.voteFor(proposalId).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+    this.logger.info(voteTx);
+  }
+
+  async voteChoice(proposalId: number, choiceId: number): Promise<void> {
+    this.logger.debug(`vote choice: ${proposalId} – ${choiceId}`);
+    const voteTx = await this.strategy.methods.voteChoice(proposalId, choiceId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
     });
@@ -232,25 +275,7 @@ export class CollectiveGovernance {
     this.logger.info(voteTx);
   }
 
-  async community(): Promise<string> {
-    const communityHexEnc = await this.contract.methods.community().call();
-    const community = this.web3.utils.hexToAscii(communityHexEnc);
-    return community;
-  }
-
-  async url(): Promise<string> {
-    return await this.contract.methods.url().call();
-  }
-
-  async description(): Promise<string> {
-    return await this.contract.methods.description().call();
-  }
-
   async voteSucceeded(proposalId: number): Promise<boolean> {
     return await this.strategy.methods.getVoteSucceeded(proposalId).call();
-  }
-
-  async getStorageAddress(): Promise<string> {
-    return await this.contract.methods.getStorageAddress().call();
   }
 }

@@ -33,6 +33,16 @@
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "cancel.ts",
+      "program": "${workspaceFolder}/src/cancel.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

@@ -36,8 +36,8 @@ import { Contract } from 'web3-eth-contract';
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
 
-export class Storage {
-  static ABI_NAME = 'Storage.json';
+export class MetaStorage {
+  static ABI_NAME = 'MetaStorage.json';
 
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
@@ -49,52 +49,39 @@ export class Storage {
   constructor(abiPath: string, contractAddress: string, web3: Web3) {
     this.contractAddress = contractAddress;
     this.web3 = web3;
-    const abiFile = pathWithSlash(abiPath) + Storage.ABI_NAME;
+    const abiFile = pathWithSlash(abiPath) + MetaStorage.ABI_NAME;
     this.logger.info(`Loading ABI: ${abiFile}`);
     this.contractAbi = loadAbi(abiFile);
     this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
 
-  async name(): Promise<string> {
-    const name = await this.contract.methods.name().call();
-    return name;
+  async community(): Promise<string> {
+    const communityHexEnc = await this.contract.methods.community().call();
+    const community = this.web3.utils.hexToAscii(communityHexEnc);
+    return community;
   }
 
-  async version(): Promise<number> {
-    const version = await this.contract.methods.version().call();
-    return version;
+  async description(): Promise<string> {
+    const description = await this.contract.methods.description().call();
+    return description;
   }
 
-  async quorumRequired(proposalId: number): Promise<number> {
-    return await this.contract.methods.quorumRequired(proposalId).call();
+  async url(): Promise<string> {
+    const description = await this.contract.methods.url().call();
+    return description;
   }
 
-  async voteDelay(proposalId: number): Promise<number> {
-    return await this.contract.methods.voteDelay(proposalId).call();
+  async getMetaDescription(proposalId: number): Promise<string> {
+    return await this.contract.methods.description(proposalId).call();
   }
 
-  async voteDuration(proposalId: number): Promise<number> {
-    return await this.contract.methods.voteDuration(proposalId).call();
+  async getMetaUrl(proposalId: number): Promise<string> {
+    return await this.contract.methods.url(proposalId).call();
   }
 
-  async startTime(proposalId: number): Promise<number> {
-    return await this.contract.methods.startTime(proposalId).call();
-  }
-
-  async endTime(proposalId: number): Promise<number> {
-    return await this.contract.methods.endTime(proposalId).call();
-  }
-
-  async getWinningChoice(proposalId: number): Promise<number> {
-    return await this.contract.methods.getWinningChoice(proposalId).call();
-  }
-
-  async getChoice(
-    proposalId: number,
-    choiceId: number
-  ): Promise<{ name: string; description: string; transactionId: number; voteCount: number }> {
-    const metaData = await this.contract.methods.getChoice(proposalId, choiceId).call();
+  async getMeta(proposalId: number, metaId: number): Promise<{ name: string; value: string }> {
+    const metaData = await this.contract.methods.getMeta(proposalId, metaId).call();
     const decodedName = this.web3.utils.hexToAscii(metaData[0]);
-    return { name: decodedName, description: metaData[1], transactionId: metaData[2], voteCount: metaData[3] };
+    return { name: decodedName, value: metaData[1] };
   }
 }

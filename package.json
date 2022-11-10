@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "simple": "node dist/simplevote.js",
+    "choice": "node dist/choicevote.js",
     "cancel": "node dist/cancel.js",
     "vaultpayment": "node dist/vaultpayment.js",
     "create_governance": "node dist/create_governance.js",

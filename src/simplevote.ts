@@ -36,6 +36,7 @@ import { Config } from './config';
 import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
 import { Storage } from './storage';
+import { MetaStorage } from './metastorage';
 import { timeNow, timeout } from './time';
 import { EthWallet } from './wallet';
 
@@ -45,6 +46,14 @@ const run = async () => {
   try {
     const config = new Config();
     const web3 = new Web3(config.rpcUrl);
+
+    if (!config.storageAddress) {
+      throw new Error('Storage contract is required');
+    }
+
+    if (!config.metaStorage) {
+      throw new Error('MetaStorage contract is required');
+    }
 
     logger.info(`Governance Started`);
 
@@ -57,14 +66,17 @@ const run = async () => {
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
-    const community = await governance.community();
+    const metaAddress = config.metaStorage;
+    const meta = new MetaStorage(config.abiPath, metaAddress, web3);
+
+    const community = await meta.community();
     logger.info(`Community: ${community}`);
-    const communityUrl = await governance.url();
+    const communityUrl = await meta.url();
     logger.info(`Community Url: ${communityUrl}`);
-    const description = await governance.description();
+    const description = await meta.description();
     logger.info(`Description: ${description}`);
 
-    const storageAddress = await governance.getStorageAddress();
+    const storageAddress = config.storageAddress;
     const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
@@ -73,11 +85,12 @@ const run = async () => {
     const proposalId = await governance.propose();
     await governance.describe(
       proposalId,
-      'This is a demo vote on Collective Governance Contract',
+      'This is a vote on Collective Governance Contract',
       'https://github.com/collectivexyz/collective_governance_js'
     );
-    const metaId = await governance.addMeta(proposalId, 'vote_time', new Date().toISOString());
-    await governance.configure(proposalId, 1);
+    const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
+    await governance.addMeta(proposalId, 'vote_end', new Date((timeNow() + 3600) * 1000).toISOString());
+    await governance.configureDelay(proposalId, 1, 300, 3600);
 
     const quorum = await storage.quorumRequired(proposalId);
     const duration = await storage.voteDuration(proposalId);
@@ -96,13 +109,13 @@ const run = async () => {
     // voting shares
     await governance.voteFor(proposalId);
 
-    const desc = await storage.description(proposalId);
+    const desc = await meta.getMetaDescription(proposalId);
     logger.info(`Description: ${desc}`);
 
-    const url = await storage.url(proposalId);
+    const url = await meta.getMetaUrl(proposalId);
     logger.info(`Url: ${url}`);
 
-    const metaData = await storage.getMeta(proposalId, metaId);
+    const metaData = await meta.getMeta(proposalId, metaId);
     logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
     let voteStatus = await governance.isOpen(proposalId);

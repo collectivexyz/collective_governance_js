@@ -42,12 +42,6 @@ import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
-// this shows an example of configuring a vault with
-// an attached payment
-
-// this example is using this example contract to management payments
-// https://github.com/jac18281828/transfervault
-
 const run = async () => {
   try {
     const config = new Config();
@@ -59,10 +53,6 @@ const run = async () => {
 
     if (!config.metaStorage) {
       throw new Error('MetaStorage contract is required');
-    }
-
-    if (!config.vaultContract) {
-      throw Error('Vault not configured');
     }
 
     logger.info(`Governance Started`);
@@ -92,26 +82,78 @@ const run = async () => {
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);
 
-    const proposalId = await governance.propose();
+    const proposalId = await governance.choiceVote(5);
+    await governance.describe(
+      proposalId,
+      'Who is the greatest in the world?',
+      'https://github.com/collectivexyz/collective_governance_js'
+    );
 
     // add 10 minutes to ensure eta is within allowable lock range
     const etaOfLock = timeNow() + config.getMinimumDuration() + 10 * 60;
-
-    await governance.attachTransaction(
+    let tId = await governance.attachTransaction(
       proposalId,
-      config.vaultContract,
-      config.getVaultValue(),
-      config.vaultSignature,
-      config.vaultCalldata,
+      '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
+      0,
+      'set(address,uint256)',
+      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000000',
       etaOfLock
     );
 
-    await governance.configure(proposalId, 1);
+    await governance.setChoice(proposalId, 0, 'Erling Haaland', 'Norwegian striker', tId);
+
+    tId = await governance.attachTransaction(
+      proposalId,
+      '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
+      0,
+      'set(address,uint256)',
+      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000001',
+      etaOfLock
+    );
+
+    await governance.setChoice(proposalId, 1, 'Karim Benzema', 'French forward', tId);
+
+    tId = await governance.attachTransaction(
+      proposalId,
+      '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
+      0,
+      'set(address,uint256)',
+      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000002',
+      etaOfLock
+    );
+
+    await governance.setChoice(proposalId, 2, 'Sadio Mané', 'Senegal striker', tId);
+
+    tId = await governance.attachTransaction(
+      proposalId,
+      '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
+      0,
+      'set(address,uint256)',
+      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000003',
+      etaOfLock
+    );
+
+    await governance.setChoice(proposalId, 3, 'Robert Lewandowski', 'Polish striker', tId);
+
+    tId = await governance.attachTransaction(
+      proposalId,
+      '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
+      0,
+      'set(address,uint256)',
+      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000004',
+      etaOfLock
+    );
+
+    await governance.setChoice(proposalId, 4, 'Mohamed Salah', 'Egyptian forward', tId);
+
+    const metaId = await governance.addMeta(proposalId, 'vote_time', new Date().toISOString());
+    await governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
+    await governance.configureDelay(proposalId, 3, 300, 3600);
 
     const quorum = await storage.quorumRequired(proposalId);
     const duration = await storage.voteDuration(proposalId);
 
-    logger.info(`New Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
+    logger.info(`Choice Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
 
     const startTime = await storage.startTime(proposalId);
     while (timeNow() < startTime) {
@@ -123,14 +165,23 @@ const run = async () => {
     logger.info('Voting started...');
 
     // voting shares
-    await governance.voteFor(proposalId);
+    await governance.voteChoice(proposalId, 2);
+
+    const desc = await meta.getMetaDescription(proposalId);
+    logger.info(`Description: ${desc}`);
+
+    const url = await meta.getMetaUrl(proposalId);
+    logger.info(`Url: ${url}`);
+
+    const metaData = await meta.getMeta(proposalId, metaId);
+    logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
     let voteStatus = await governance.isOpen(proposalId);
     while (voteStatus) {
       const endTime = await storage.endTime(proposalId);
       let sleepFor = endTime - timeNow();
       while (sleepFor > 0) {
-        logger.info(`Voting in progress... sleeping for ${sleepFor}`);
+        logger.info(`Voting in progress...sleeping for ${sleepFor}`);
         await timeout(sleepFor * 1000);
         sleepFor = endTime - timeNow();
       }
@@ -144,9 +195,14 @@ const run = async () => {
     }
 
     await governance.endVote(proposalId);
+
     const measurePassed = await governance.voteSucceeded(proposalId);
     if (measurePassed) {
-      logger.info('The measure has passed');
+      const choiceId = await storage.getWinningChoice(proposalId);
+      const choice = await storage.getChoice(proposalId, choiceId);
+      logger.info(
+        `There is a winner: ${choiceId}, ${choice.name}, ${choice.description}, ${choice.transactionId}, ${choice.voteCount}`
+      );
     } else {
       logger.info('The measure has failed');
     }

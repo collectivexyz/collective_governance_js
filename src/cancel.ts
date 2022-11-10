@@ -36,6 +36,7 @@ import { Config } from './config';
 import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
 import { Storage } from './storage';
+import { MetaStorage } from './metastorage';
 import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
@@ -44,6 +45,14 @@ const run = async () => {
   try {
     const config = new Config();
     const web3 = new Web3(config.rpcUrl);
+
+    if (!config.storageAddress) {
+      throw new Error('Storage contract is required');
+    }
+
+    if (!config.metaStorage) {
+      throw new Error('MetaStorage contract is required');
+    }
 
     logger.info(`Cancel Existing Proposal`);
 
@@ -56,24 +65,31 @@ const run = async () => {
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
-    const community = await governance.community();
+    const metaAddress = config.metaStorage;
+    const meta = new MetaStorage(config.abiPath, metaAddress, web3);
+
+    const community = await meta.community();
     logger.info(`Community: ${community}`);
-    const url = await governance.url();
-    logger.info(`Community Url: ${url}`);
-    const description = await governance.description();
+    const communityUrl = await meta.url();
+    logger.info(`Community Url: ${communityUrl}`);
+    const description = await meta.description();
     logger.info(`Description: ${description}`);
 
-    const storageAddress = await governance.getStorageAddress();
+    const storageAddress = config.storageAddress;
     const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = config.getProposalId();
+    const startTime = await storage.startTime(proposalId);
+    logger.info(`Vote start time ${new Date(startTime * 1000).toISOString()}`);
+    const endTime = await storage.endTime(proposalId);
+    logger.info(`Vote ends at ${new Date(endTime * 1000).toISOString()}`);
     await governance.cancel(proposalId);
     const voteStatus = await governance.isOpen(proposalId);
     if (!voteStatus) {
-      logger.info('Vote closed');
+      logger.info(`Vote closed`);
     } else {
       logger.info('Vote not cancelled');
     }

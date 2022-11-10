@@ -43,6 +43,8 @@ export class Config {
   public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
   public readonly voterClass: string = process.env.VOTER_CLASS || '';
   public readonly contractAddress: string = process.env.CONTRACT_ADDRESS || '';
+  public readonly storageAddress: string = process.env.STORAGE_ADDRESS || '';
+  public readonly metaStorage: string = process.env.META_STORAGE || '';
   public readonly builderAddress: string = process.env.BUILDER_ADDRESS || '';
   public readonly rpcUrl: string = process.env.RPC_URL || 'wss://localhost:8545';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
