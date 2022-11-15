@@ -55,6 +55,16 @@ export class MetaStorage {
     this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
 
+  async name(): Promise<string> {
+    const name = await this.contract.methods.name().call();
+    return name;
+  }
+
+  async version(): Promise<number> {
+    const version = await this.contract.methods.version().call();
+    return version;
+  }
+
   async community(): Promise<string> {
     const communityHexEnc = await this.contract.methods.community().call();
     const community = this.web3.utils.hexToAscii(communityHexEnc);

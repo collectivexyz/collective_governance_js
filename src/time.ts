@@ -43,7 +43,7 @@ export async function timeout(duration: number): Promise<void> {
   });
 }
 
-export async function blockTimeNow(web3: Web3): Promise<number> {
+export async function blocktimeNow(web3: Web3): Promise<number> {
   const blockNumber = await web3.eth.getBlockNumber();
   const block = await web3.eth.getBlock(blockNumber);
   if (typeof block.timestamp === 'string') {

@@ -42,9 +42,6 @@ export class Config {
   public readonly abiPath: string = process.env.ABI_PATH || '';
   public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
   public readonly voterClass: string = process.env.VOTER_CLASS || '';
-  public readonly contractAddress: string = process.env.CONTRACT_ADDRESS || '';
-  public readonly storageAddress: string = process.env.STORAGE_ADDRESS || '';
-  public readonly metaStorage: string = process.env.META_STORAGE || '';
   public readonly builderAddress: string = process.env.BUILDER_ADDRESS || '';
   public readonly rpcUrl: string = process.env.RPC_URL || 'wss://localhost:8545';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
@@ -56,6 +53,7 @@ export class Config {
   public readonly gas: string = process.env.GAS || '470000';
   public readonly minimumDuration: string = process.env.MINIMUM_DURATION || '86400';
   public readonly proposalId: string = process.env.PROPOSAL_ID || '';
+  public readonly buildTxId: string = process.env.BUILD_TX || '';
 
   constructor() {
     if (!this.abiPath) {
@@ -70,10 +68,6 @@ export class Config {
       throw new Error('Builder address required');
     }
 
-    if (!this.contractAddress) {
-      this.logger.warn('Contract address is required for voting and proposals');
-    }
-
     if (!this.rpcUrl) {
       throw new Error('RPC url is required');
     }
@@ -84,6 +78,10 @@ export class Config {
 
     if (!this.tokenContract) {
       throw new Error('Project address is required');
+    }
+
+    if (!this.buildTxId) {
+      throw new Error('Build Transaction is required');
     }
   }
 

@@ -38,6 +38,7 @@ import { LoggerFactory } from './logging';
 import { Storage } from './storage';
 import { MetaStorage } from './metastorage';
 import { EthWallet } from './wallet';
+import { GovernanceBuilder } from './governancebuilder';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
@@ -46,28 +47,29 @@ const run = async () => {
     const config = new Config();
     const web3 = new Web3(config.rpcUrl);
 
-    if (!config.storageAddress) {
-      throw new Error('Storage contract is required');
-    }
-
-    if (!config.metaStorage) {
-      throw new Error('MetaStorage contract is required');
-    }
-
     logger.info(`Cancel Existing Proposal`);
-
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    const governance = new CollectiveGovernance(config.abiPath, config.contractAddress, web3, wallet, config.getGas());
-    logger.info(`Connected to contract: ${config.contractAddress}`);
+    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
+    const contractAddress = await builder.discoverContractAddress(config.buildTxId);
+    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
+    logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
     const name = await governance.name();
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
-    const metaAddress = config.metaStorage;
+    const metaAddress = contractAddress.metaAddress;
     const meta = new MetaStorage(config.abiPath, metaAddress, web3);
+    const metaName = await meta.name();
+    const metaVersion = await meta.version();
 
+    if (version !== metaVersion) {
+      logger.error(`Required meta version ${version}`);
+      throw new Error('MetaStorage version mismatch');
+    }
+
+    logger.info(`${metaName}: ${metaVersion}`);
     const community = await meta.community();
     logger.info(`Community: ${community}`);
     const communityUrl = await meta.url();
@@ -75,10 +77,16 @@ const run = async () => {
     const description = await meta.description();
     logger.info(`Description: ${description}`);
 
-    const storageAddress = config.storageAddress;
+    const storageAddress = contractAddress.storageAddress;
     const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
+
+    if (version != storageVersion) {
+      logger.error(`Required storage version ${version}`);
+      throw new Error('Storage version mismatch');
+    }
+
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = config.getProposalId();

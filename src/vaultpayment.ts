@@ -37,8 +37,9 @@ import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
 import { Storage } from './storage';
 import { MetaStorage } from './metastorage';
-import { timeNow, timeout } from './time';
+import { blocktimeNow, timeNow, timeout } from './time';
 import { EthWallet } from './wallet';
+import { GovernanceBuilder } from './governancebuilder';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
@@ -51,34 +52,35 @@ const logger = LoggerFactory.getLogger(module.filename);
 const run = async () => {
   try {
     const config = new Config();
-    const web3 = new Web3(config.rpcUrl);
-
-    if (!config.storageAddress) {
-      throw new Error('Storage contract is required');
-    }
-
-    if (!config.metaStorage) {
-      throw new Error('MetaStorage contract is required');
-    }
 
     if (!config.vaultContract) {
       throw Error('Vault not configured');
     }
 
+    const web3 = new Web3(config.rpcUrl);
     logger.info(`Governance Started`);
-
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    const governance = new CollectiveGovernance(config.abiPath, config.contractAddress, web3, wallet, config.getGas());
-    logger.info(`Connected to contract: ${config.contractAddress}`);
+    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
+    const contractAddress = await builder.discoverContractAddress(config.buildTxId);
+    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
+    logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
     const name = await governance.name();
     const version = await governance.version();
     logger.info(`${name}: ${version}`);
 
-    const metaAddress = config.metaStorage;
+    const metaAddress = contractAddress.metaAddress;
     const meta = new MetaStorage(config.abiPath, metaAddress, web3);
+    const metaName = await meta.name();
+    const metaVersion = await meta.version();
 
+    if (version !== metaVersion) {
+      logger.error(`Required meta version ${version}`);
+      throw new Error('MetaStorage version mismatch');
+    }
+
+    logger.info(`${metaName}: ${metaVersion}`);
     const community = await meta.community();
     logger.info(`Community: ${community}`);
     const communityUrl = await meta.url();
@@ -86,16 +88,25 @@ const run = async () => {
     const description = await meta.description();
     logger.info(`Description: ${description}`);
 
-    const storageAddress = config.storageAddress;
+    const storageAddress = contractAddress.storageAddress;
     const storage = new Storage(config.abiPath, storageAddress, web3);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
+
+    if (version != storageVersion) {
+      logger.error(`Required storage version ${version}`);
+      throw new Error('Storage version mismatch');
+    }
+
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = await governance.propose();
 
+    const blockTime = await blocktimeNow(web3);
+    const blockTimeDelta = Math.abs(blockTime - timeNow());
+
     // add 10 minutes to ensure eta is within allowable lock range
-    const etaOfLock = timeNow() + config.getMinimumDuration() + 10 * 60;
+    const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
 
     await governance.attachTransaction(
       proposalId,
@@ -114,7 +125,7 @@ const run = async () => {
     logger.info(`New Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
 
     const startTime = await storage.startTime(proposalId);
-    while (timeNow() < startTime) {
+    while (timeNow() < startTime + blockTimeDelta) {
       logger.info('Waiting for start ...');
       await timeout((startTime - timeNow()) * 1000);
     }
@@ -126,14 +137,13 @@ const run = async () => {
     await governance.voteFor(proposalId);
 
     let voteStatus = await governance.isOpen(proposalId);
+    const endTime = await storage.endTime(proposalId);
     while (voteStatus) {
-      const endTime = await storage.endTime(proposalId);
-      let sleepFor = endTime - timeNow();
-      while (sleepFor > 0) {
-        logger.info(`Voting in progress... sleeping for ${sleepFor}`);
-        await timeout(sleepFor * 1000);
-        sleepFor = endTime - timeNow();
-      }
+      const sleepFor = Math.max(endTime - timeNow() + blockTimeDelta, 1000);
+      logger.info(`Voting in progress... sleeping for ${sleepFor}`);
+      logger.info(`endTime: ${new Date(endTime * 1000).toISOString()}`);
+      logger.flush();
+      await timeout(sleepFor * 1000);
       voteStatus = await governance.isOpen(proposalId);
     }
 

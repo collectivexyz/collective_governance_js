@@ -37,6 +37,13 @@ import { Wallet } from './wallet';
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
 
+interface ContractAddress {
+  governanceAddress: string;
+  storageAddress: string;
+  metaAddress: string;
+  timelockAddress: string;
+}
+
 export class GovernanceBuilder {
   static ABI_NAME = 'GovernanceBuilder.json';
 
@@ -152,5 +159,35 @@ export class GovernanceBuilder {
       return governance;
     }
     throw new Error('Unknown Governance created');
+  }
+
+  async discoverContractAddress(txId: string): Promise<ContractAddress> {
+    const tx = await this.web3.eth.getTransaction(txId);
+    if (!tx.blockNumber) {
+      throw new Error(`Block not known for txId: ${txId}`);
+    }
+    const eventArray = await this.contract.getPastEvents('GovernanceContractCreated', {
+      fromBlock: tx.blockNumber,
+      toBlock: tx.blockNumber,
+    });
+    let governanceAddress = '';
+    let storageAddress = '';
+    let metaAddress = '';
+    let timelockAddress = '';
+    eventArray.forEach((e) => {
+      governanceAddress = e.returnValues['governance'];
+      storageAddress = e.returnValues['metaStorage'];
+      timelockAddress = e.returnValues['timeLock'];
+      metaAddress = e.returnValues['metaStorage'];
+    });
+    this.logger.info(
+      `Found governance: ${governanceAddress}, storage: ${storageAddress}, meta: ${metaAddress}, timelock: ${timelockAddress}`
+    );
+    return {
+      governanceAddress: governanceAddress,
+      storageAddress: storageAddress,
+      metaAddress: metaAddress,
+      timelockAddress: timelockAddress,
+    };
   }
 }
