@@ -89,6 +89,10 @@ export class Storage {
     return await this.contract.methods.getWinningChoice(proposalId).call();
   }
 
+  async choiceCount(proposalId: number): Promise<number> {
+    return await this.contract.methods.choiceCount(proposalId).call();
+  }
+
   async getChoice(
     proposalId: number,
     choiceId: number

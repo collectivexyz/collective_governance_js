@@ -186,7 +186,7 @@ export class CollectiveGovernance {
   }
 
   async startVote(proposalId: number): Promise<void> {
-    this.logger.debug('start vote');
+    this.logger.debug(`start vote: ${proposalId}`);
     const openTx = await this.strategy.methods.startVote(proposalId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
@@ -195,7 +195,7 @@ export class CollectiveGovernance {
   }
 
   async endVote(proposalId: number): Promise<void> {
-    this.logger.debug('end vote');
+    this.logger.debug(`end vote: ${proposalId}`);
     const endTx = await this.strategy.methods.endVote(proposalId).send({
       from: this.wallet.getAddress(),
       gas: this.gas,

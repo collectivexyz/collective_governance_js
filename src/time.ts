@@ -31,6 +31,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import Web3 from 'web3';
+
 export function timeNow(): number {
   return Math.floor(Date.now() / 1000);
 }
@@ -39,4 +41,13 @@ export async function timeout(duration: number): Promise<void> {
   return new Promise<void>((resolve) => {
     setTimeout(resolve, duration);
   });
+}
+
+export async function blockTimeNow(web3: Web3): Promise<number> {
+  const blockNumber = await web3.eth.getBlockNumber();
+  const block = await web3.eth.getBlock(blockNumber);
+  if (typeof block.timestamp === 'string') {
+    return parseInt(block.timestamp);
+  }
+  return block.timestamp;
 }

@@ -42,7 +42,7 @@ import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
-const run = async () => {
+async function run() {
   try {
     const config = new Config();
     const web3 = new Web3(config.rpcUrl);
@@ -82,24 +82,25 @@ const run = async () => {
     const storageVersion = await storage.version();
     logger.info(`${storageName}: ${storageVersion}`);
 
+    // add 10 minutes to ensure eta is within allowable lock range
+    const etaOfLock = timeNow() + config.getMinimumDuration() + 10 * 60;
+
     const proposalId = await governance.choiceVote(5);
+
     await governance.describe(
       proposalId,
       'Who is the greatest in the world?',
       'https://github.com/collectivexyz/collective_governance_js'
     );
 
-    // add 10 minutes to ensure eta is within allowable lock range
-    const etaOfLock = timeNow() + config.getMinimumDuration() + 10 * 60;
     let tId = await governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
-      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000000',
+      '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000000',
       etaOfLock
     );
-
     await governance.setChoice(proposalId, 0, 'Erling Haaland', 'Norwegian striker', tId);
 
     tId = await governance.attachTransaction(
@@ -107,10 +108,9 @@ const run = async () => {
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
-      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000001',
+      '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000001',
       etaOfLock
     );
-
     await governance.setChoice(proposalId, 1, 'Karim Benzema', 'French forward', tId);
 
     tId = await governance.attachTransaction(
@@ -118,10 +118,9 @@ const run = async () => {
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
-      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000002',
+      '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000002',
       etaOfLock
     );
-
     await governance.setChoice(proposalId, 2, 'Sadio Mané', 'Senegal striker', tId);
 
     tId = await governance.attachTransaction(
@@ -129,10 +128,9 @@ const run = async () => {
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
-      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000003',
+      '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000003',
       etaOfLock
     );
-
     await governance.setChoice(proposalId, 3, 'Robert Lewandowski', 'Polish striker', tId);
 
     tId = await governance.attachTransaction(
@@ -140,15 +138,14 @@ const run = async () => {
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
-      '0x0000000000000000000000006ceb0bf1f28ca4165d5c0a04f61dc733987ed6ad0000000000000000000000000000000000000000000000000000000000000004',
+      '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000004',
       etaOfLock
     );
-
     await governance.setChoice(proposalId, 4, 'Mohamed Salah', 'Egyptian forward', tId);
 
-    const metaId = await governance.addMeta(proposalId, 'vote_time', new Date().toISOString());
+    const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
     await governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
-    await governance.configureDelay(proposalId, 3, 300, 3600);
+    await governance.configure(proposalId, 3);
 
     const quorum = await storage.quorumRequired(proposalId);
     const duration = await storage.voteDuration(proposalId);
@@ -158,6 +155,7 @@ const run = async () => {
     const startTime = await storage.startTime(proposalId);
     while (timeNow() < startTime) {
       logger.info('Waiting for start ...');
+      logger.flush();
       await timeout((startTime - timeNow()) * 1000);
     }
 
@@ -182,6 +180,7 @@ const run = async () => {
       let sleepFor = endTime - timeNow();
       while (sleepFor > 0) {
         logger.info(`Voting in progress...sleeping for ${sleepFor}`);
+        logger.flush();
         await timeout(sleepFor * 1000);
         sleepFor = endTime - timeNow();
       }
@@ -191,10 +190,16 @@ const run = async () => {
     while (timeNow() < etaOfLock) {
       const remainingTime = etaOfLock - timeNow();
       logger.info(`Awaiting timeLock... sleeping for ${remainingTime}`);
+      logger.flush();
       await timeout(remainingTime * 1000);
     }
 
     await governance.endVote(proposalId);
+    const cCount = await storage.choiceCount(proposalId);
+    for (let id = 0; id < cCount; id++) {
+      const choice = await storage.getChoice(proposalId, id);
+      logger.info(`Choice ${id + 1}, ${choice.name}, ${choice.description}, ${choice.transactionId}, ${choice.voteCount}`);
+    }
 
     const measurePassed = await governance.voteSucceeded(proposalId);
     if (measurePassed) {
@@ -210,7 +215,7 @@ const run = async () => {
     logger.error(error);
     throw new Error('Run failed');
   }
-};
+}
 
 run()
   .then(() => process.exit(0))

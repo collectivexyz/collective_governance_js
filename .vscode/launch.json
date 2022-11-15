@@ -17,6 +17,16 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "choicevote.ts",
+      "program": "${workspaceFolder}/src/choicevote.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "create_governance.ts",
       "program": "${workspaceFolder}/src/create_governance.ts",
       "cwd": "${workspaceFolder}",
