@@ -176,7 +176,7 @@ export class GovernanceBuilder {
     let timelockAddress = '';
     eventArray.forEach((e) => {
       governanceAddress = e.returnValues['governance'];
-      storageAddress = e.returnValues['metaStorage'];
+      storageAddress = e.returnValues['_storage'];
       timelockAddress = e.returnValues['timeLock'];
       metaAddress = e.returnValues['metaStorage'];
     });

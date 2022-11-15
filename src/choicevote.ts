@@ -157,7 +157,7 @@ async function run() {
 
     const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
     await governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
-    await governance.configure(proposalId, 3);
+    await governance.configureDelay(proposalId, 3, 300, 3600);
 
     const quorum = await storage.quorumRequired(proposalId);
     const duration = await storage.voteDuration(proposalId);
