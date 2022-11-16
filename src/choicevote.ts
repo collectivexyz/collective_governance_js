@@ -99,12 +99,6 @@ async function run() {
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
     const proposalId = await governance.choiceVote(5);
 
-    await governance.describe(
-      proposalId,
-      'Who is the greatest in the world?',
-      'https://github.com/collectivexyz/collective_governance_js'
-    );
-
     let tId = await governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
@@ -155,10 +149,7 @@ async function run() {
     );
     await governance.setChoice(proposalId, 4, 'Mohamed Salah', 'Egyptian forward', tId);
 
-    const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
-    await governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
     await governance.configureDelay(proposalId, 3, 300, 3600);
-
     const quorum = await storage.quorumRequired(proposalId);
     const duration = await storage.voteDuration(proposalId);
 
@@ -177,15 +168,6 @@ async function run() {
 
     // voting shares
     await governance.voteChoice(proposalId, 2);
-
-    const desc = await meta.getMetaDescription(proposalId);
-    logger.info(`Description: ${desc}`);
-
-    const url = await meta.getMetaUrl(proposalId);
-    logger.info(`Url: ${url}`);
-
-    const metaData = await meta.getMeta(proposalId, metaId);
-    logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
     let voteStatus = await governance.isOpen(proposalId);
     const endTime = await storage.endTime(proposalId);
