@@ -168,7 +168,8 @@ async function run() {
     while (timeNow() < startTime + blockTimeDelta) {
       logger.info('Waiting for start ...');
       logger.flush();
-      await timeout((startTime - timeNow()) * 1000);
+      const deltaTime = Math.max((startTime - timeNow()) * 1000, 1000);
+      await timeout(deltaTime);
     }
 
     await governance.startVote(proposalId);

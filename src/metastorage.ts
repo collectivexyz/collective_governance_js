@@ -62,7 +62,7 @@ export class MetaStorage {
 
   async version(): Promise<number> {
     const version = await this.contract.methods.version().call();
-    return version;
+    return parseInt(version);
   }
 
   async community(): Promise<string> {

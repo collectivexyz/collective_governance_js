@@ -62,35 +62,42 @@ export class Storage {
 
   async version(): Promise<number> {
     const version = await this.contract.methods.version().call();
-    return version;
+    return parseInt(version);
   }
 
   async quorumRequired(proposalId: number): Promise<number> {
-    return await this.contract.methods.quorumRequired(proposalId).call();
+    const quorum = await this.contract.methods.quorumRequired(proposalId).call();
+    return parseInt(quorum);
   }
 
   async voteDelay(proposalId: number): Promise<number> {
-    return await this.contract.methods.voteDelay(proposalId).call();
+    const delay = await this.contract.methods.voteDelay(proposalId).call();
+    return parseInt(delay);
   }
 
   async voteDuration(proposalId: number): Promise<number> {
-    return await this.contract.methods.voteDuration(proposalId).call();
+    const duration = await this.contract.methods.voteDuration(proposalId).call();
+    return parseInt(duration);
   }
 
   async startTime(proposalId: number): Promise<number> {
-    return await this.contract.methods.startTime(proposalId).call();
+    const timeStr = await this.contract.methods.startTime(proposalId).call();
+    return parseInt(timeStr);
   }
 
   async endTime(proposalId: number): Promise<number> {
-    return await this.contract.methods.endTime(proposalId).call();
+    const timeStr = await this.contract.methods.endTime(proposalId).call();
+    return parseInt(timeStr);
   }
 
   async getWinningChoice(proposalId: number): Promise<number> {
-    return await this.contract.methods.getWinningChoice(proposalId).call();
+    const choiceNum = await this.contract.methods.getWinningChoice(proposalId).call();
+    return parseInt(choiceNum);
   }
 
   async choiceCount(proposalId: number): Promise<number> {
-    return await this.contract.methods.choiceCount(proposalId).call();
+    const choiceCount = await this.contract.methods.choiceCount(proposalId).call();
+    return parseInt(choiceCount);
   }
 
   async getChoice(
@@ -99,6 +106,11 @@ export class Storage {
   ): Promise<{ name: string; description: string; transactionId: number; voteCount: number }> {
     const metaData = await this.contract.methods.getChoice(proposalId, choiceId).call();
     const decodedName = this.web3.utils.hexToAscii(metaData[0]);
-    return { name: decodedName, description: metaData[1], transactionId: metaData[2], voteCount: metaData[3] };
+    return {
+      name: decodedName,
+      description: metaData[1],
+      transactionId: parseInt(metaData[2]),
+      voteCount: parseInt(metaData[3]),
+    };
   }
 }

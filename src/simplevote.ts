@@ -67,7 +67,6 @@ const run = async () => {
     const meta = new MetaStorage(config.abiPath, metaAddress, web3);
     const metaName = await meta.name();
     const metaVersion = await meta.version();
-
     if (version !== metaVersion) {
       logger.error(`Required meta version ${version}`);
       throw new Error('MetaStorage version mismatch');
@@ -113,7 +112,9 @@ const run = async () => {
     const startTime = await storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {
       logger.info('Waiting for start ...');
-      await timeout((startTime - timeNow()) * 1000);
+      logger.flush();
+      const deltaTime = Math.max((startTime - timeNow()) * 1000, 1000);
+      await timeout(deltaTime);
     }
 
     await governance.startVote(proposalId);

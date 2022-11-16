@@ -127,7 +127,9 @@ const run = async () => {
     const startTime = await storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {
       logger.info('Waiting for start ...');
-      await timeout((startTime - timeNow()) * 1000);
+      logger.flush();
+      const deltaTime = Math.max((startTime - timeNow()) * 1000, 1000);
+      await timeout(deltaTime);
     }
 
     await governance.startVote(proposalId);

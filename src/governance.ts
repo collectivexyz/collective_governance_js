@@ -77,7 +77,7 @@ export class CollectiveGovernance {
 
   async version(): Promise<number> {
     const version = await this.contract.methods.version().call();
-    return version;
+    return parseInt(version);
   }
 
   async propose(): Promise<number> {
@@ -164,7 +164,7 @@ export class CollectiveGovernance {
   }
 
   async configure(proposalId: number, quorum: number): Promise<void> {
-    this.logger.debug('configure vote');
+    this.logger.debug(`configure vote: ${proposalId}, ${quorum}`);
     const configureTx = await this.contract.methods.configure(proposalId, quorum).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
@@ -173,7 +173,7 @@ export class CollectiveGovernance {
   }
 
   async configureDelay(proposalId: number, quorum: number, requiredDelay: number, requiredDuration: number): Promise<void> {
-    this.logger.debug('configure vote');
+    this.logger.debug(`configure vote: ${proposalId}, ${quorum}, ${requiredDelay}, ${requiredDuration}`);
     const configureTx = await this.contract.methods.configureWithDelay(proposalId, quorum, requiredDelay, requiredDuration).send({
       from: this.wallet.getAddress(),
       gas: this.gas,
