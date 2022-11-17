@@ -166,10 +166,10 @@ async function run() {
 
     const startTime = await storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {
-      const deltaTime = Math.max((startTime - timeNow()) * 1000, 1000);
-      logger.info(`Waiting for start ... ${deltaTime/1000} s`);
+      const deltaTime = Math.max(startTime - timeNow(), 1);
+      logger.info(`Waiting for start ... ${deltaTime} s`);
       logger.flush();
-      await timeout(deltaTime);
+      await timeout(deltaTime * 1000);
     }
 
     await governance.startVote(proposalId);
@@ -190,7 +190,7 @@ async function run() {
     let voteStatus = await governance.isOpen(proposalId);
     const endTime = await storage.endTime(proposalId);
     while (voteStatus) {
-      const sleepFor = Math.max(endTime - timeNow() + blockTimeDelta, 1000);
+      const sleepFor = Math.max(endTime - timeNow() + blockTimeDelta, 1);
       logger.info(`Voting in progress...sleeping for ${sleepFor}`);
       logger.info(`endTime: ${new Date(endTime * 1000).toISOString()}`);
       logger.flush();
