@@ -93,6 +93,13 @@ const run = async () => {
     logger.info(`${storageName}: ${storageVersion}`);
 
     const proposalId = await governance.propose();
+    await governance.describe(
+      proposalId,
+      'This is a vote on Collective Governance Contract',
+      'https://github.com/collectivexyz/collective_governance_js'
+    );
+    const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
+    await governance.addMeta(proposalId, 'vote_end', new Date((timeNow() + 3600) * 1000).toISOString());
     await governance.configureDelay(proposalId, 1, 300, 3600);
 
     const quorum = await storage.quorumRequired(proposalId);
@@ -115,6 +122,15 @@ const run = async () => {
 
     // voting shares
     await governance.voteFor(proposalId);
+
+    const desc = await meta.getMetaDescription(proposalId);
+    logger.info(`Description: ${desc}`);
+
+    const url = await meta.getMetaUrl(proposalId);
+    logger.info(`Url: ${url}`);
+
+    const metaData = await meta.getMeta(proposalId, metaId);
+    logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
     let voteStatus = await governance.isOpen(proposalId);
     const endTime = await storage.endTime(proposalId);
