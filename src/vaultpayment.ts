@@ -127,7 +127,7 @@ const run = async () => {
     const startTime = await storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {
       const deltaTime = Math.max((startTime - timeNow()) * 1000, 1000);
-      logger.info(`Waiting for start ... ${deltaTime} s`);
+      logger.info(`Waiting for start ... ${deltaTime/1000} s`);
       logger.flush();
       await timeout(deltaTime);
     }
