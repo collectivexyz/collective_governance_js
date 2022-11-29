@@ -1,13 +1,14 @@
 {
   "name": "collective_governance",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Collective Governance JavaScript Reference",
   "main": "dist/index.js",
   "scripts": {
+    "id": "node dist/id.js",
     "simple": "node dist/simplevote.js",
     "choice": "node dist/choicevote.js",
     "cancel": "node dist/cancel.js",
-    "vaultpayment": "node dist/vaultpayment.js",
+    "vaultpayment": "node di0xf0d3f294b2abf228343c86e005501338ffba147f99f2a707cce10c1fcacf5f2dst/vaultpayment.js",
     "create_governance": "node dist/create_governance.js",
     "create_voterclass": "node dist/create_voterclass.js",
     "build": "tsc",

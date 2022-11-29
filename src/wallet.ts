@@ -40,9 +40,9 @@ export interface Wallet {
 }
 
 export class EthWallet implements Wallet {
-  private walletAddress;
-  private account: any;
-  private web3: Web3;
+  private readonly walletAddress;
+  private readonly account: any;
+  private readonly web3: Web3;
 
   constructor(privateKey: string, web3: Web3) {
     this.walletAddress = getKeyAsEthereumKey(privateKey);

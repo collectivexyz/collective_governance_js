@@ -40,11 +40,12 @@ export class VoterClassFactory {
 
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
-  private contractAddress: string;
-  private wallet: Wallet;
-  private contractAbi: any[];
-  private contract: Contract;
-  private gas: number;
+  public readonly contractAddress: string;
+
+  private readonly wallet: Wallet;
+  private readonly contractAbi: any[];
+  private readonly contract: Contract;
+  private readonly gas: number;
 
   constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
     this.contractAddress = contractAddress;

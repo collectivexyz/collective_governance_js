@@ -32,27 +32,13 @@
  */
 
 import { connect } from './connect';
-import { Config } from './config';
 import { LoggerFactory } from './logging';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
 const run = async () => {
   try {
-    const config = new Config();
-    const collective = await connect();
-    const proposalId = config.getProposalId();
-    const startTime = await collective.storage.startTime(proposalId);
-    logger.info(`Vote start time ${new Date(startTime * 1000).toISOString()}`);
-    const endTime = await collective.storage.endTime(proposalId);
-    logger.info(`Vote ends at ${new Date(endTime * 1000).toISOString()}`);
-    await collective.governance.cancel(proposalId);
-    const voteStatus = await collective.governance.isOpen(proposalId);
-    if (!voteStatus) {
-      logger.info(`Vote closed`);
-    } else {
-      logger.info('Vote not cancelled');
-    }
+    await connect();
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');

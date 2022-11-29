@@ -41,10 +41,11 @@ export class Storage {
 
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
-  private contractAddress: string;
-  private web3: Web3;
-  private contractAbi: any[];
-  private contract: Contract;
+  public readonly contractAddress: string;
+
+  private readonly web3: Web3;
+  private readonly contractAbi: any[];
+  private readonly contract: Contract;
 
   constructor(abiPath: string, contractAddress: string, web3: Web3) {
     this.contractAddress = contractAddress;

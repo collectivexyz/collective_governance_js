@@ -31,81 +31,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Web3 from 'web3';
 import { Config } from './config';
-import { CollectiveGovernance } from './governance';
+import { connect } from './connect';
 import { LoggerFactory } from './logging';
-import { Storage } from './storage';
-import { MetaStorage } from './metastorage';
 import { blocktimeNow, timeNow, timeout } from './time';
-import { EthWallet } from './wallet';
-import { GovernanceBuilder } from './governancebuilder';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
 async function run() {
   try {
     const config = new Config();
-    const web3 = new Web3(config.rpcUrl);
 
     logger.info(`Governance Started`);
-
-    const wallet = new EthWallet(config.privateKey, web3);
-    wallet.connect();
-    logger.info(`Wallet connected: ${wallet.getAddress()}`);
-
-    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const contractAddress = await builder.discoverContractAddress(config.buildTxId);
-
-    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
-    logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
-    const name = await governance.name();
-    const version = await governance.version();
-    logger.info(`${name}: ${version}`);
-
-    const metaAddress = contractAddress.metaAddress;
-    const meta = new MetaStorage(config.abiPath, metaAddress, web3);
-    const metaName = await meta.name();
-    const metaVersion = await meta.version();
-
-    if (version !== metaVersion) {
-      logger.error(`Required meta version ${version}`);
-      throw new Error('MetaStorage version mismatch');
-    }
-
-    logger.info(`${metaName}: ${metaVersion}`);
-    const community = await meta.community();
-    logger.info(`Community: ${community}`);
-    const communityUrl = await meta.url();
-    logger.info(`Community Url: ${communityUrl}`);
-    const description = await meta.description();
-    logger.info(`Description: ${description}`);
-
-    const storageAddress = contractAddress.storageAddress;
-    const storage = new Storage(config.abiPath, storageAddress, web3);
-    const storageName = await storage.name();
-    const storageVersion = await storage.version();
-
-    if (version != storageVersion) {
-      logger.error(`Required storage version ${version}`);
-      throw new Error('Storage version mismatch');
-    }
-
-    logger.info(`${storageName}: ${storageVersion}`);
-
-    const blockTime = await blocktimeNow(web3);
+    const collective = await connect();
+    const blockTime = await blocktimeNow(collective.governance.web3);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
     // add 10 minutes to ensure eta is within allowable lock range
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
-    const proposalId = await governance.choiceVote(5);
+    const proposalId = await collective.governance.choiceVote(5);
 
-    await governance.describe(
+    await collective.governance.describe(
       proposalId,
       'Who is the greatest in the world?',
       'https://github.com/collectivexyz/collective_governance_js'
     );
 
-    let tId = await governance.attachTransaction(
+    let tId = await collective.governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
@@ -113,9 +64,9 @@ async function run() {
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000000',
       etaOfLock
     );
-    await governance.setChoice(proposalId, 0, 'Erling Haaland', 'Norwegian striker', tId);
+    await collective.governance.setChoice(proposalId, 0, 'Erling Haaland', 'Norwegian striker', tId);
 
-    tId = await governance.attachTransaction(
+    tId = await collective.governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
@@ -123,9 +74,9 @@ async function run() {
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000001',
       etaOfLock
     );
-    await governance.setChoice(proposalId, 1, 'Karim Benzema', 'French forward', tId);
+    await collective.governance.setChoice(proposalId, 1, 'Karim Benzema', 'French forward', tId);
 
-    tId = await governance.attachTransaction(
+    tId = await collective.governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
@@ -133,9 +84,9 @@ async function run() {
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000002',
       etaOfLock
     );
-    await governance.setChoice(proposalId, 2, 'Sadio Mané', 'Senegal striker', tId);
+    await collective.governance.setChoice(proposalId, 2, 'Sadio Mané', 'Senegal striker', tId);
 
-    tId = await governance.attachTransaction(
+    tId = await collective.governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
@@ -143,9 +94,9 @@ async function run() {
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000003',
       etaOfLock
     );
-    await governance.setChoice(proposalId, 3, 'Robert Lewandowski', 'Polish striker', tId);
+    await collective.governance.setChoice(proposalId, 3, 'Robert Lewandowski', 'Polish striker', tId);
 
-    tId = await governance.attachTransaction(
+    tId = await collective.governance.attachTransaction(
       proposalId,
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
@@ -153,18 +104,18 @@ async function run() {
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000004',
       etaOfLock
     );
-    await governance.setChoice(proposalId, 4, 'Mohamed Salah', 'Egyptian forward', tId);
+    await collective.governance.setChoice(proposalId, 4, 'Mohamed Salah', 'Egyptian forward', tId);
 
-    const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
-    await governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
-    await governance.configureDelay(proposalId, 3, 300, 3600);
+    const metaId = await collective.governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
+    await collective.governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
+    await collective.governance.configureDelay(proposalId, 3, 300, 3600);
 
-    const quorum = await storage.quorumRequired(proposalId);
-    const duration = await storage.voteDuration(proposalId);
+    const quorum = await collective.storage.quorumRequired(proposalId);
+    const duration = await collective.storage.voteDuration(proposalId);
 
     logger.info(`Choice Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
 
-    const startTime = await storage.startTime(proposalId);
+    const startTime = await collective.storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {
       const deltaTime = Math.max(startTime - timeNow(), 1);
       logger.info(`Waiting for start ... ${deltaTime} s`);
@@ -172,30 +123,30 @@ async function run() {
       await timeout(deltaTime * 1000);
     }
 
-    await governance.startVote(proposalId);
+    await collective.governance.startVote(proposalId);
     logger.info('Voting started...');
 
     // voting shares
-    await governance.voteChoice(proposalId, 2);
+    await collective.governance.voteChoice(proposalId, 2);
 
-    const desc = await meta.getMetaDescription(proposalId);
+    const desc = await collective.meta.getMetaDescription(proposalId);
     logger.info(`Description: ${desc}`);
 
-    const url = await meta.getMetaUrl(proposalId);
+    const url = await collective.meta.getMetaUrl(proposalId);
     logger.info(`Url: ${url}`);
 
-    const metaData = await meta.getMeta(proposalId, metaId);
+    const metaData = await collective.meta.getMeta(proposalId, metaId);
     logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
-    let voteStatus = await governance.isOpen(proposalId);
-    const endTime = await storage.endTime(proposalId);
+    let voteStatus = await collective.governance.isOpen(proposalId);
+    const endTime = await collective.storage.endTime(proposalId);
     while (voteStatus) {
       const sleepFor = Math.max(endTime - timeNow() + blockTimeDelta, 1);
       logger.info(`Voting in progress...sleeping for ${sleepFor}`);
       logger.info(`endTime: ${new Date(endTime * 1000).toISOString()}`);
       logger.flush();
       await timeout(sleepFor * 1000);
-      voteStatus = await governance.isOpen(proposalId);
+      voteStatus = await collective.governance.isOpen(proposalId);
     }
 
     while (timeNow() < etaOfLock) {
@@ -205,17 +156,17 @@ async function run() {
       await timeout(remainingTime * 1000);
     }
 
-    await governance.endVote(proposalId);
-    const cCount = await storage.choiceCount(proposalId);
+    await collective.governance.endVote(proposalId);
+    const cCount = await collective.storage.choiceCount(proposalId);
     for (let id = 0; id < cCount; id++) {
-      const choice = await storage.getChoice(proposalId, id);
+      const choice = await collective.storage.getChoice(proposalId, id);
       logger.info(`Choice ${id + 1}, ${choice.name}, ${choice.description}, ${choice.transactionId}, ${choice.voteCount}`);
     }
 
-    const measurePassed = await governance.voteSucceeded(proposalId);
+    const measurePassed = await collective.governance.voteSucceeded(proposalId);
     if (measurePassed) {
-      const choiceId = await storage.getWinningChoice(proposalId);
-      const choice = await storage.getChoice(proposalId, choiceId);
+      const choiceId = await collective.storage.getWinningChoice(proposalId);
+      const choice = await collective.storage.getChoice(proposalId, choiceId);
       logger.info(
         `There is a winner: ${choiceId}, ${choice.name}, ${choice.description}, ${choice.transactionId}, ${choice.voteCount}`
       );

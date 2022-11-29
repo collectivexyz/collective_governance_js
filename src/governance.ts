@@ -43,14 +43,15 @@ export class CollectiveGovernance {
   static ABI_NAME = 'Governance.json';
   static STRAT_NAME = 'VoteStrategy.json';
 
-  private contractAddress: string;
-  private web3: Web3;
-  private wallet: Wallet;
-  private contractAbi: any[];
-  private contract: Contract;
-  private stratAbi: any[];
-  private strategy: Contract;
-  private gas: number;
+  public readonly contractAddress: string;
+  public readonly web3: Web3;
+  private readonly wallet: Wallet;
+
+  private readonly contractAbi: any[];
+  private readonly contract: Contract;
+  private readonly stratAbi: any[];
+  private readonly strategy: Contract;
+  private readonly gas: number;
 
   constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
     this.contractAddress = contractAddress;

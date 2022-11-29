@@ -31,85 +31,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Web3 from 'web3';
-import { Config } from './config';
-import { CollectiveGovernance } from './governance';
+import { connect } from './connect';
 import { LoggerFactory } from './logging';
-import { Storage } from './storage';
-import { MetaStorage } from './metastorage';
 import { timeNow, blocktimeNow, timeout } from './time';
-import { EthWallet } from './wallet';
-import { GovernanceBuilder } from './governancebuilder';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
 const run = async () => {
   try {
-    const config = new Config();
-    const web3 = new Web3(config.rpcUrl);
+    const collective = await connect();
 
-    logger.info(`Governance Started`);
-
-    const wallet = new EthWallet(config.privateKey, web3);
-    wallet.connect();
-    logger.info(`Wallet connected: ${wallet.getAddress()}`);
-
-    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const contractAddress = await builder.discoverContractAddress(config.buildTxId);
-
-    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
-    logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
-    const name = await governance.name();
-    const version = await governance.version();
-    logger.info(`${name}: ${version}`);
-
-    const metaAddress = contractAddress.metaAddress;
-    const meta = new MetaStorage(config.abiPath, metaAddress, web3);
-    const metaName = await meta.name();
-    const metaVersion = await meta.version();
-    if (version !== metaVersion) {
-      logger.error(`Required meta version ${version}`);
-      throw new Error('MetaStorage version mismatch');
-    }
-
-    logger.info(`${metaName}: ${metaVersion}`);
-    const community = await meta.community();
-    logger.info(`Community: ${community}`);
-    const communityUrl = await meta.url();
-    logger.info(`Community Url: ${communityUrl}`);
-    const description = await meta.description();
-    logger.info(`Description: ${description}`);
-
-    const storageAddress = contractAddress.storageAddress;
-    const storage = new Storage(config.abiPath, storageAddress, web3);
-    const storageName = await storage.name();
-    const storageVersion = await storage.version();
-
-    if (version != storageVersion) {
-      logger.error(`Required storage version ${version}`);
-      throw new Error('Storage version mismatch');
-    }
-
-    logger.info(`${storageName}: ${storageVersion}`);
-
-    const proposalId = await governance.propose();
-    await governance.describe(
+    const proposalId = await collective.governance.propose();
+    await collective.governance.describe(
       proposalId,
       'This is a vote on Collective Governance Contract',
       'https://github.com/collectivexyz/collective_governance_js'
     );
-    const metaId = await governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
-    await governance.addMeta(proposalId, 'vote_end', new Date((timeNow() + 3600) * 1000).toISOString());
-    await governance.configureDelay(proposalId, 1, 300, 3600);
+    const metaId = await collective.governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
+    await collective.governance.addMeta(proposalId, 'vote_end', new Date((timeNow() + 3600) * 1000).toISOString());
+    await collective.governance.configureDelay(proposalId, 1, 300, 3600);
 
-    const quorum = await storage.quorumRequired(proposalId);
-    const duration = await storage.voteDuration(proposalId);
+    const quorum = await collective.storage.quorumRequired(proposalId);
+    const duration = await collective.storage.voteDuration(proposalId);
 
     logger.info(`New Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
 
-    const blockTime = await blocktimeNow(web3);
+    const blockTime = await blocktimeNow(collective.governance.web3);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
-    const startTime = await storage.startTime(proposalId);
+    const startTime = await collective.storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {
       const deltaTime = Math.max(startTime - timeNow(), 1);
       logger.info(`Waiting for start ... ${deltaTime} s`);
@@ -117,35 +66,35 @@ const run = async () => {
       await timeout(deltaTime * 1000);
     }
 
-    await governance.startVote(proposalId);
+    await collective.governance.startVote(proposalId);
     logger.info('Voting started...');
 
     // voting shares
-    await governance.voteFor(proposalId);
+    await collective.governance.voteFor(proposalId);
 
-    const desc = await meta.getMetaDescription(proposalId);
+    const desc = await collective.meta.getMetaDescription(proposalId);
     logger.info(`Description: ${desc}`);
 
-    const url = await meta.getMetaUrl(proposalId);
+    const url = await collective.meta.getMetaUrl(proposalId);
     logger.info(`Url: ${url}`);
 
-    const metaData = await meta.getMeta(proposalId, metaId);
+    const metaData = await collective.meta.getMeta(proposalId, metaId);
     logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
-    let voteStatus = await governance.isOpen(proposalId);
-    const endTime = await storage.endTime(proposalId);
+    let voteStatus = await collective.governance.isOpen(proposalId);
+    const endTime = await collective.storage.endTime(proposalId);
     while (voteStatus) {
       const sleepFor = Math.max(endTime - timeNow() + blockTimeDelta, 1);
       logger.info(`Voting in progress...sleeping for ${sleepFor}`);
       logger.info(`endTime: ${new Date(endTime * 1000).toISOString()}`);
       logger.flush();
       await timeout(sleepFor * 1000);
-      voteStatus = await governance.isOpen(proposalId);
+      voteStatus = await collective.governance.isOpen(proposalId);
     }
 
-    await governance.endVote(proposalId);
+    await collective.governance.endVote(proposalId);
 
-    const measurePassed = await governance.voteSucceeded(proposalId);
+    const measurePassed = await collective.governance.voteSucceeded(proposalId);
     if (measurePassed) {
       logger.info('The measure has passed');
     } else {
