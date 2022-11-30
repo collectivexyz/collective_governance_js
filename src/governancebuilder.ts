@@ -32,10 +32,9 @@
  */
 
 import Web3 from 'web3';
-import { Contract, EventData } from 'web3-eth-contract';
+import { EventData } from 'web3-eth-contract';
 import { Wallet } from './wallet';
-import { loadAbi, pathWithSlash } from './abi';
-import { LoggerFactory } from './logging';
+import { ContractAbi } from './contractabi';
 
 interface ContractAddress {
   governanceAddress: string;
@@ -44,30 +43,16 @@ interface ContractAddress {
   timelockAddress: string;
 }
 
-export class GovernanceBuilder {
+export class GovernanceBuilder  extends ContractAbi {
   static ABI_NAME = 'GovernanceBuilder.json';
 
-  private readonly logger = LoggerFactory.getLogger(module.filename);
-
-  public readonly contractAddress: string;
-
-  private readonly web3: Web3;
   private readonly wallet: Wallet;
-  private readonly contractAbi: any[];
-  private readonly contract: Contract;
   private readonly gas: number;
 
   constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
-    this.contractAddress = contractAddress;
-    this.web3 = web3;
+    super(abiPath, GovernanceBuilder.ABI_NAME, contractAddress, web3);
     this.wallet = wallet;
     this.gas = gas;
-
-    const abiFile = pathWithSlash(abiPath) + GovernanceBuilder.ABI_NAME;
-    this.logger.info(`Loading ABI: ${abiFile}`);
-    this.contractAbi = loadAbi(abiFile);
-    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
-    this.logger.info(`Connected to contract ${this.contractAddress}`);
   }
 
   async name(): Promise<string> {

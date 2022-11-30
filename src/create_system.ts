@@ -56,12 +56,14 @@ const run = async () => {
     const system = new System(config.abiPath, config.systemCreator, web3, wallet, config.getGas());
 
     const name = `Collective Governance ${timeNow()}`;
-    const transactionHash = await system.create(
+    const transactionHash = await system.createWithDuration(
       name,
       'https://collectivexyz.github.io/collective-governance-v1',
       'Collective Governance contract created by collective_governance_js.',
       config.tokenContract,
-      1
+      1,
+      300,
+      3600
     );
     logger.info(`Governance contract created by transaction ${transactionHash}`);
   } catch (error) {

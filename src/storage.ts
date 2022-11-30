@@ -32,28 +32,13 @@
  */
 
 import Web3 from 'web3';
-import { Contract } from 'web3-eth-contract';
-import { loadAbi, pathWithSlash } from './abi';
-import { LoggerFactory } from './logging';
+import { ContractAbi } from './contractabi';
 
-export class Storage {
+export class Storage  extends ContractAbi {
   static ABI_NAME = 'Storage.json';
 
-  private readonly logger = LoggerFactory.getLogger(module.filename);
-
-  public readonly contractAddress: string;
-
-  private readonly web3: Web3;
-  private readonly contractAbi: any[];
-  private readonly contract: Contract;
-
   constructor(abiPath: string, contractAddress: string, web3: Web3) {
-    this.contractAddress = contractAddress;
-    this.web3 = web3;
-    const abiFile = pathWithSlash(abiPath) + Storage.ABI_NAME;
-    this.logger.info(`Loading ABI: ${abiFile}`);
-    this.contractAbi = loadAbi(abiFile);
-    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
+    super(abiPath, Storage.ABI_NAME, contractAddress, web3);
   }
 
   async name(): Promise<string> {

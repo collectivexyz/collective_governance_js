@@ -36,7 +36,7 @@ import { Contract } from 'web3-eth-contract';
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
 
-export class AbiContract {
+export class ContractAbi {
   protected readonly logger = LoggerFactory.getLogger(module.filename);
 
   public readonly contractAddress: string;

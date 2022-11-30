@@ -32,11 +32,10 @@
  */
 
 import Web3 from 'web3';
-import { EventData } from 'web3-eth-contract';
 import { Wallet } from './wallet';
-import { AbiContract } from './abicontract';
+import { ContractAbi } from './contractabi';
 
-export class System extends AbiContract {
+export class System extends ContractAbi {
   static ABI_NAME = 'System.json';
 
   private readonly wallet: Wallet;
@@ -60,4 +59,18 @@ export class System extends AbiContract {
 
     return buildTx.transactionHash;
   }
+
+  async createWithDuration(name: string, url: string, description: string, erc721contract: string, quorum: number, delay: number, duration: number): Promise<string> {
+    this.logger.info(`Create Governance: ${name}, ${url}, ${description}, ${erc721contract}, ${quorum}, ${delay}, ${duration}`);
+    const encodedName = this.web3.utils.asciiToHex(name);
+    const buildTx = await this.contract.methods.create(encodedName, url, description, erc721contract, quorum, delay, duration).send({
+      from: this.wallet.getAddress(),
+      gas: this.gas,
+    });
+
+    this.logger.debug(buildTx);
+
+    return buildTx.transactionHash;
+  }
+
 }
