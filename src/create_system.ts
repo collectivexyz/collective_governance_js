@@ -33,8 +33,8 @@
 
 import Web3 from 'web3';
 import { Config } from './config';
-import { GovernanceBuilder } from './governancebuilder';
 import { LoggerFactory } from './logging';
+import { System } from './system';
 import { EthWallet } from './wallet';
 
 const logger = LoggerFactory.getLogger(module.filename);
@@ -47,20 +47,11 @@ const run = async () => {
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
     logger.info('Building Governance Contract');
-    const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const name = await governanceBuilder.name();
-    logger.info(name);
+    const system = new System(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
 
-    await governanceBuilder.aGovernance();
-
-    await governanceBuilder.withName(`Collective Governance ${new Date().toISOString()}`);
-    await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
-    await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
-    await governanceBuilder.withSupervisor(wallet.getAddress());
-    await governanceBuilder.withVoterClassAddress(config.voterClass);
-    await governanceBuilder.withMinimumDuration(config.getMinimumDuration());
-    const governanceAddress = await governanceBuilder.build();
-    logger.info(`Governance contract created at ${governanceAddress}`);
+    const name = `Collective Governance ${new Date().toISOString()}`;
+    const collective = await system.create(name, 'https://collectivexyz.github.io/collective-governance-v1', 'Collective Governance contract created by collective_governance_js.', config.tokenContract, 1);
+    logger.info(`Governance contract created at ${collective.governanceAddress}`);
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');
@@ -70,3 +61,4 @@ const run = async () => {
 run()
   .then(() => process.exit(0))
   .catch((error) => logger.error(error));
+

@@ -32,41 +32,25 @@
  */
 
 import Web3 from 'web3';
-import { Config } from './config';
-import { GovernanceBuilder } from './governancebuilder';
+import { Contract } from 'web3-eth-contract';
+import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
-import { EthWallet } from './wallet';
 
-const logger = LoggerFactory.getLogger(module.filename);
+export class AbiContract {
+  protected readonly logger = LoggerFactory.getLogger(module.filename);
 
-const run = async () => {
-  try {
-    const config = new Config();
-    const web3 = new Web3(config.rpcUrl);
-    const wallet = new EthWallet(config.privateKey, web3);
-    wallet.connect();
-    logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    logger.info('Building Governance Contract');
-    const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const name = await governanceBuilder.name();
-    logger.info(name);
+  public readonly contractAddress: string;
 
-    await governanceBuilder.aGovernance();
+  protected readonly web3: Web3;
+  protected readonly contractAbi: any[];
+  protected readonly contract: Contract;
 
-    await governanceBuilder.withName(`Collective Governance ${new Date().toISOString()}`);
-    await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
-    await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
-    await governanceBuilder.withSupervisor(wallet.getAddress());
-    await governanceBuilder.withVoterClassAddress(config.voterClass);
-    await governanceBuilder.withMinimumDuration(config.getMinimumDuration());
-    const governanceAddress = await governanceBuilder.build();
-    logger.info(`Governance contract created at ${governanceAddress}`);
-  } catch (error) {
-    logger.error(error);
-    throw new Error('Run failed');
+  constructor(abiPath: string, abiName: string, contractAddress: string, web3: Web3) {
+    this.contractAddress = contractAddress;
+    this.web3 = web3;
+    const abiFile = pathWithSlash(abiPath) + abiName;
+    this.logger.info(`Loading ABI: ${abiFile}`);
+    this.contractAbi = loadAbi(abiFile);
+    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
-};
-
-run()
-  .then(() => process.exit(0))
-  .catch((error) => logger.error(error));
+}
