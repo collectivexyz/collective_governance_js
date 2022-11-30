@@ -54,6 +54,7 @@ export class Config {
   public readonly minimumDuration: string = process.env.MINIMUM_DURATION || '86400';
   public readonly proposalId: string = process.env.PROPOSAL_ID || '';
   public readonly buildTxId: string = process.env.BUILD_TX || '';
+  public readonly systemCreator: string = process.env.SYSTEM_CREATOR || '';
 
   constructor() {
     if (!this.abiPath) {

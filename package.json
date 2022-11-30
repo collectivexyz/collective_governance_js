@@ -9,7 +9,7 @@
     "choice": "node dist/choicevote.js",
     "cancel": "node dist/cancel.js",
     "vaultpayment": "node dist/vaultpayment.js",
-    "create_system": "node dist/create_systemjs",
+    "create_system": "node dist/create_system.js",
     "create_governance": "node dist/create_governance.js",
     "create_voterclass": "node dist/create_voterclass.js",
     "build": "tsc",

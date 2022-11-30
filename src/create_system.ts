@@ -42,15 +42,26 @@ const logger = LoggerFactory.getLogger(module.filename);
 const run = async () => {
   try {
     const config = new Config();
+
+    if (!config.systemCreator) {
+      throw new Error('System creator is required');
+    }
+
     const web3 = new Web3(config.rpcUrl);
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
     logger.info('Building Governance Contract');
-    const system = new System(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
+    const system = new System(config.abiPath, config.systemCreator, web3, wallet, config.getGas());
 
     const name = `Collective Governance ${new Date().toISOString()}`;
-    const collective = await system.create(name, 'https://collectivexyz.github.io/collective-governance-v1', 'Collective Governance contract created by collective_governance_js.', config.tokenContract, 1);
+    const collective = await system.create(
+      name,
+      'https://collectivexyz.github.io/collective-governance-v1',
+      'Collective Governance contract created by collective_governance_js.',
+      config.tokenContract,
+      1
+    );
     logger.info(`Governance contract created at ${collective.governanceAddress}`);
   } catch (error) {
     logger.error(error);
@@ -61,4 +72,3 @@ const run = async () => {
 run()
   .then(() => process.exit(0))
   .catch((error) => logger.error(error));
-
