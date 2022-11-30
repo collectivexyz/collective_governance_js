@@ -36,6 +36,7 @@ import { Config } from './config';
 import { LoggerFactory } from './logging';
 import { System } from './system';
 import { EthWallet } from './wallet';
+import { timeNow } from './time';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
@@ -54,15 +55,15 @@ const run = async () => {
     logger.info('Building Governance Contract');
     const system = new System(config.abiPath, config.systemCreator, web3, wallet, config.getGas());
 
-    const name = `Collective Governance ${new Date().toISOString()}`;
-    const collective = await system.create(
+    const name = `Collective Governance ${timeNow()}`;
+    const transactionHash = await system.create(
       name,
       'https://collectivexyz.github.io/collective-governance-v1',
       'Collective Governance contract created by collective_governance_js.',
       config.tokenContract,
       1
     );
-    logger.info(`Governance contract created at ${collective.governanceAddress}`);
+    logger.info(`Governance contract created by transaction ${transactionHash}`);
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');

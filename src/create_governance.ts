@@ -36,6 +36,7 @@ import { Config } from './config';
 import { GovernanceBuilder } from './governancebuilder';
 import { LoggerFactory } from './logging';
 import { EthWallet } from './wallet';
+import { timeNow } from './time';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
@@ -53,7 +54,7 @@ const run = async () => {
 
     await governanceBuilder.aGovernance();
 
-    await governanceBuilder.withName(`Collective Governance ${new Date().toISOString()}`);
+    await governanceBuilder.withName(`Collective Governance ${timeNow()}`);
     await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
     await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
     await governanceBuilder.withSupervisor(wallet.getAddress());

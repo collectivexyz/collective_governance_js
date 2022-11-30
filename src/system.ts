@@ -36,14 +36,8 @@ import { EventData } from 'web3-eth-contract';
 import { Wallet } from './wallet';
 import { AbiContract } from './abicontract';
 
-export interface Collective {
-  governanceAddress: string;
-  storageAddress: string;
-  metaAddress: string;
-}
-
 export class System extends AbiContract {
-  static ABI_NAME = 'Storage.json';
+  static ABI_NAME = 'System.json';
 
   private readonly wallet: Wallet;
   private readonly gas: number;
@@ -54,7 +48,7 @@ export class System extends AbiContract {
     this.gas = gas;
   }
 
-  async create(name: string, url: string, description: string, erc721contract: string, quorum: number): Promise<Collective> {
+  async create(name: string, url: string, description: string, erc721contract: string, quorum: number): Promise<string> {
     this.logger.info(`Create Governance: ${name}, ${url}, ${description}, ${erc721contract}, ${quorum}`);
     const encodedName = this.web3.utils.asciiToHex(name);
     const buildTx = await this.contract.methods.create(encodedName, url, description, erc721contract, quorum).send({
@@ -62,17 +56,8 @@ export class System extends AbiContract {
       gas: this.gas,
     });
 
-    const event: EventData = buildTx.events['GovernanceContractCreated'];
-    const governance = event.returnValues['governance'];
-    const storage = event.returnValues['_storage'];
-    const meta = event.returnValues['metaStorage'];
-    if (governance && storage && meta) {
-      const collective = { governanceAddress: governance, storageAddress: storage, metaAddress: meta };
-      this.logger.info(
-        `created governance: ${collective.governanceAddress}, storage: ${collective.storageAddress}, meta: ${collective.metaAddress}`
-      );
-      return collective;
-    }
-    throw new Error('Governance creation failed');
+    this.logger.debug(buildTx);
+
+    return buildTx.transactionHash;
   }
 }
