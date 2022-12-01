@@ -60,7 +60,7 @@ export class System extends ContractAbi {
     return buildTx.transactionHash;
   }
 
-  async createWithDuration(name: string, url: string, description: string, erc721contract: string, quorum: number, delay: number, duration: number): Promise<string> {
+  async createWithDelay(name: string, url: string, description: string, erc721contract: string, quorum: number, delay: number, duration: number): Promise<string> {
     this.logger.info(`Create Governance: ${name}, ${url}, ${description}, ${erc721contract}, ${quorum}, ${delay}, ${duration}`);
     const encodedName = this.web3.utils.asciiToHex(name);
     const buildTx = await this.contract.methods.create(encodedName, url, description, erc721contract, quorum, delay, duration).send({

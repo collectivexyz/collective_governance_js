@@ -173,7 +173,7 @@ export class CollectiveGovernance {
     this.logger.info(configureTx);
   }
 
-  async configureDelay(proposalId: number, quorum: number, requiredDelay: number, requiredDuration: number): Promise<void> {
+  async configureWithDelay(proposalId: number, quorum: number, requiredDelay: number, requiredDuration: number): Promise<void> {
     this.logger.debug(`configure vote: ${proposalId}, ${quorum}, ${requiredDelay}, ${requiredDuration}`);
     const configureTx = await this.contract.methods.configure(proposalId, quorum, requiredDelay, requiredDuration).send({
       from: this.wallet.getAddress(),

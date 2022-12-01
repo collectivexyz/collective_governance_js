@@ -49,7 +49,7 @@ const run = async () => {
     );
     const metaId = await collective.governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
     await collective.governance.addMeta(proposalId, 'vote_end', new Date((timeNow() + 3600) * 1000).toISOString());
-    await collective.governance.configureDelay(proposalId, 1, 3600, 86400);
+    await collective.governance.configureWithDelay(proposalId, 1, 300, 3600);
 
     const quorum = await collective.storage.quorumRequired(proposalId);
     const duration = await collective.storage.voteDuration(proposalId);
