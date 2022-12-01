@@ -47,4 +47,4 @@ RUN yarn prettier:check
 RUN yarn eslint
 RUN yarn build
 
-CMD npm start
+CMD yarn test

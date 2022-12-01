@@ -36,11 +36,10 @@ import { ContractAbi } from './contractabi';
 
 export class MetaStorage extends ContractAbi {
   static ABI_NAME = 'MetaStorage.json';
-    
+
   constructor(abiPath: string, contractAddress: string, web3: Web3) {
     super(abiPath, MetaStorage.ABI_NAME, contractAddress, web3);
   }
-
 
   async name(): Promise<string> {
     const name = await this.contract.methods.name().call();

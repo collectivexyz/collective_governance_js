@@ -1,2 +1,8 @@
 dist/
 node_modules/
+.vscode/
+.devcontainer
+run.sh
+.env.example
+LICENSE
+README.md

@@ -34,7 +34,7 @@
 import Web3 from 'web3';
 import { ContractAbi } from './contractabi';
 
-export class Storage  extends ContractAbi {
+export class Storage extends ContractAbi {
   static ABI_NAME = 'Storage.json';
 
   constructor(abiPath: string, contractAddress: string, web3: Web3) {

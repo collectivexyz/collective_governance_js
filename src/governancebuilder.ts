@@ -43,7 +43,7 @@ interface ContractAddress {
   timelockAddress: string;
 }
 
-export class GovernanceBuilder  extends ContractAbi {
+export class GovernanceBuilder extends ContractAbi {
   static ABI_NAME = 'GovernanceBuilder.json';
 
   private readonly wallet: Wallet;
