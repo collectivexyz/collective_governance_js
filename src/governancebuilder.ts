@@ -49,13 +49,13 @@ export class GovernanceBuilder extends ContractAbi {
   }
 
   async name(): Promise<string> {
-    const name = await this.contract.methods.name();
+    const name = await this.contract.name();
     return name;
   }
 
   async aGovernance(): Promise<GovernanceBuilder> {
     this.logger.info('Governance Builder Started');
-    const tx = await this.contract.methods.aGovernance();
+    const tx = await this.contract.aGovernance();
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -64,7 +64,7 @@ export class GovernanceBuilder extends ContractAbi {
   async withName(name: string): Promise<GovernanceBuilder> {
     this.logger.info(`withName ${name}`);
     const encodedName = ethers.utils.formatBytes32String(name);
-    const tx = await this.contract.methods.withName(encodedName);
+    const tx = await this.contract.withName(encodedName);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -72,7 +72,7 @@ export class GovernanceBuilder extends ContractAbi {
 
   async withUrl(url: string): Promise<GovernanceBuilder> {
     this.logger.info(`withUrl ${url}`);
-    const tx = await this.contract.methods.withUrl(url);
+    const tx = await this.contract.withUrl(url);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -80,7 +80,7 @@ export class GovernanceBuilder extends ContractAbi {
 
   async withDescription(desc: string): Promise<GovernanceBuilder> {
     this.logger.info(`withDescription ${desc}`);
-    const tx = await this.contract.methods.withDescription(desc);
+    const tx = await this.contract.withDescription(desc);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -88,7 +88,7 @@ export class GovernanceBuilder extends ContractAbi {
 
   async withSupervisor(supervisor: string): Promise<GovernanceBuilder> {
     this.logger.info(`withSupervisor ${supervisor}`);
-    const tx = await this.contract.methods.withSupervisor(supervisor);
+    const tx = await this.contract.withSupervisor(supervisor);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -96,7 +96,7 @@ export class GovernanceBuilder extends ContractAbi {
 
   async withVoterClassAddress(voterClass: string): Promise<GovernanceBuilder> {
     this.logger.info(`withVoterClass ${voterClass}`);
-    const tx = await this.contract.methods.withVoterClassAddress(voterClass);
+    const tx = await this.contract.withVoterClassAddress(voterClass);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -104,7 +104,7 @@ export class GovernanceBuilder extends ContractAbi {
 
   async withMinimumDuration(duration: number): Promise<GovernanceBuilder> {
     this.logger.info(`withMinimumDuration ${duration}`);
-    const tx = await this.contract.methods.withMinimumDuration(duration);
+    const tx = await this.contract.withMinimumDuration(duration);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     return this;
@@ -112,7 +112,7 @@ export class GovernanceBuilder extends ContractAbi {
 
   async build(): Promise<string> {
     this.logger.info('Building Governance');
-    const buildTx = await this.contract.methods.build();
+    const buildTx = await this.contract.build();
     const txReceipt = await buildTx.wait();
     this.logger.info(txReceipt);
     const event = txReceipt.events['GovernanceContractCreated'];

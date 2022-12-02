@@ -68,18 +68,18 @@ export class CollectiveGovernance implements Governance {
   }
 
   async name(): Promise<string> {
-    const name = await this.contract.methods.name();
+    const name = await this.contract.name();
     return name;
   }
 
   async version(): Promise<number> {
-    const version = await this.contract.methods.version();
+    const version = await this.contract.version();
     return parseInt(version);
   }
 
   async propose(): Promise<number> {
     this.logger.debug('Propose new vote');
-    const proposeTx = await this.contract.methods.propose();
+    const proposeTx = await this.contract.propose();
     const proposeTxReceipt = await proposeTx.wait();
     this.logger.info(proposeTxReceipt);
     const event = proposeTx.events['ProposalCreated'];
@@ -92,7 +92,7 @@ export class CollectiveGovernance implements Governance {
 
   async choiceVote(choiceCount: number): Promise<number> {
     this.logger.debug(`Propose choice vote: ${choiceCount}`);
-    const proposeTx = await this.contract.methods.propose(choiceCount);
+    const proposeTx = await this.contract.propose(choiceCount);
     const proposeTxReceipt = await proposeTx.wait();
     this.logger.info(proposeTxReceipt);
     const event = proposeTx.events['ProposalCreated'];
@@ -106,14 +106,14 @@ export class CollectiveGovernance implements Governance {
   async setChoice(proposalId: number, choiceId: number, name: string, description: string, transactionId: number): Promise<void> {
     this.logger.info(`choice: ${proposalId}, ${choiceId}, ${name}, ${description}, ${transactionId}}`);
     const encodedName = ethers.utils.formatBytes32String(name);
-    const tx = await this.contract.methods.setChoice(proposalId, choiceId, encodedName, description, transactionId);
+    const tx = await this.contract.setChoice(proposalId, choiceId, encodedName, description, transactionId);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
   }
 
   async describe(proposalId: number, description: string, url: string): Promise<void> {
     this.logger.debug(`describe: ${proposalId}, ${description}, ${url}`);
-    const tx = await this.contract.methods.describe(proposalId, description, url);
+    const tx = await this.contract.describe(proposalId, description, url);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
   }
@@ -121,7 +121,7 @@ export class CollectiveGovernance implements Governance {
   async addMeta(proposalId: number, name: string, value: string): Promise<number> {
     this.logger.debug(`addMeta: ${proposalId}, ${name}, ${value}`);
     const encodedName = ethers.utils.formatBytes32String(name);
-    const tx = await this.contract.methods.addMeta(proposalId, encodedName, value);
+    const tx = await this.contract.addMeta(proposalId, encodedName, value);
     const txReceipt = await tx.wait();
     this.logger.info(txReceipt);
     const event = txReceipt.events['ProposalMeta'];
@@ -138,7 +138,7 @@ export class CollectiveGovernance implements Governance {
     etaOfLock: number
   ): Promise<number> {
     this.logger.debug(`attach: ${proposalId}, ${target}, ${value}, ${signature}, ${calldata}, ${etaOfLock}`);
-    const attachTx = await this.contract.methods.attachTransaction(proposalId, target, value, signature, calldata, etaOfLock);
+    const attachTx = await this.contract.attachTransaction(proposalId, target, value, signature, calldata, etaOfLock);
     const attachTxReceipt = await attachTx.wait();
     this.logger.info(attachTxReceipt);
     const event = attachTxReceipt.events['ProposalTransactionAttached'];
@@ -148,93 +148,93 @@ export class CollectiveGovernance implements Governance {
 
   async configure(proposalId: number, quorum: number): Promise<void> {
     this.logger.debug(`configure vote: ${proposalId}, ${quorum}`);
-    const configureTx = await this.contract.methods.configure(proposalId, quorum);
+    const configureTx = await this.contract.configure(proposalId, quorum);
     const configureTxReceipt = await configureTx.wait();
     this.logger.info(configureTxReceipt);
   }
 
   async configureWithDelay(proposalId: number, quorum: number, requiredDelay: number, requiredDuration: number): Promise<void> {
     this.logger.debug(`configure vote: ${proposalId}, ${quorum}, ${requiredDelay}, ${requiredDuration}`);
-    const configureTx = await this.contract.methods.configure(proposalId, quorum, requiredDelay, requiredDuration);
+    const configureTx = await this.contract.configure(proposalId, quorum, requiredDelay, requiredDuration);
     const configureTxReceipt = await configureTx.wait();
     this.logger.info(configureTxReceipt);
   }
 
   async isOpen(proposalId: number): Promise<boolean> {
-    return await this.contract.methods.isOpen(proposalId).call();
+    return await this.contract.isOpen(proposalId).call();
   }
 
   async startVote(proposalId: number): Promise<void> {
     this.logger.debug(`start vote: ${proposalId}`);
-    const openTx = await this.contract.methods.startVote(proposalId);
+    const openTx = await this.contract.startVote(proposalId);
     const openTxReceipt = await openTx.wait();
     this.logger.info(openTxReceipt);
   }
 
   async endVote(proposalId: number): Promise<void> {
     this.logger.debug(`end vote: ${proposalId}`);
-    const endTx = await this.contract.methods.endVote(proposalId);
+    const endTx = await this.contract.endVote(proposalId);
     const endTxReceipt = await endTx.wait();
     this.logger.info(endTxReceipt);
   }
 
   async cancel(proposalId: number): Promise<void> {
     this.logger.debug(`cancel: ${proposalId}`);
-    const endTx = await this.contract.methods.cancel(proposalId);
+    const endTx = await this.contract.cancel(proposalId);
     const endTxReceipt = await endTx.wait();
     this.logger.info(endTxReceipt);
   }
 
   async voteFor(proposalId: number): Promise<void> {
     this.logger.debug(`vote for: ${proposalId}`);
-    const voteTx = await this.contract.methods.voteFor(proposalId);
+    const voteTx = await this.contract.voteFor(proposalId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async voteChoice(proposalId: number, choiceId: number): Promise<void> {
     this.logger.debug(`vote choice: ${proposalId} – ${choiceId}`);
-    const voteTx = await this.contract.methods.voteChoice(proposalId, choiceId);
+    const voteTx = await this.contract.voteChoice(proposalId, choiceId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async voteForWithTokenId(proposalId: number, tokenId: number): Promise<void> {
     this.logger.debug(`vote for with token: ${tokenId}`);
-    const voteTx = await this.contract.methods.voteFor(proposalId, tokenId);
+    const voteTx = await this.contract.voteFor(proposalId, tokenId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async voteAgainst(proposalId: number): Promise<void> {
     this.logger.debug('vote against');
-    const voteTx = await this.contract.methods.voteAgainst(proposalId);
+    const voteTx = await this.contract.voteAgainst(proposalId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async voteAgainstWithTokenId(proposalId: number, tokenId: number): Promise<void> {
     this.logger.debug(`vote against with token: ${tokenId}`);
-    const voteTx = await this.contract.methods.voteAgainstWithTokenId(proposalId, tokenId);
+    const voteTx = await this.contract.voteAgainstWithTokenId(proposalId, tokenId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async abstainFromVote(proposalId: number): Promise<void> {
     this.logger.debug('abstain');
-    const voteTx = await this.contract.methods.abstainFromVote(proposalId);
+    const voteTx = await this.contract.abstainFromVote(proposalId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async abstainWithTokenId(proposalId: number, tokenId: number): Promise<void> {
     this.logger.debug(`abstain for ${tokenId}`);
-    const voteTx = await this.contract.methods.abstainWithTokenId(proposalId, tokenId);
+    const voteTx = await this.contract.abstainWithTokenId(proposalId, tokenId);
     const voteTxReceipt = await voteTx.wait();
     this.logger.info(voteTxReceipt);
   }
 
   async voteSucceeded(proposalId: number): Promise<boolean> {
-    return await this.contract.methods.getVoteSucceeded(proposalId);
+    return await this.contract.getVoteSucceeded(proposalId);
   }
 }

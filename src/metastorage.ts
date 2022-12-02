@@ -43,41 +43,41 @@ export class MetaStorage extends ContractAbi {
   }
 
   async name(): Promise<string> {
-    const name = await this.contract.methods.name();
+    const name = await this.contract.name();
     return name;
   }
 
   async version(): Promise<number> {
-    const version = await this.contract.methods.version();
+    const version = await this.contract.version();
     return parseInt(version);
   }
 
   async community(): Promise<string> {
-    const communityHexEnc = await this.contract.methods.community();
+    const communityHexEnc = await this.contract.community();
     const community = ethers.utils.parseBytes32String(communityHexEnc);
     return community;
   }
 
   async description(): Promise<string> {
-    const description = await this.contract.methods.description();
+    const description = await this.contract.description();
     return description;
   }
 
   async url(): Promise<string> {
-    const description = await this.contract.methods.url();
+    const description = await this.contract.url();
     return description;
   }
 
   async getMetaDescription(proposalId: number): Promise<string> {
-    return await this.contract.methods.description(proposalId);
+    return await this.contract.description(proposalId);
   }
 
   async getMetaUrl(proposalId: number): Promise<string> {
-    return await this.contract.methods.url(proposalId);
+    return await this.contract.url(proposalId);
   }
 
   async getMeta(proposalId: number, metaId: number): Promise<{ name: string; value: string }> {
-    const metaData = await this.contract.methods.getMeta(proposalId, metaId);
+    const metaData = await this.contract.getMeta(proposalId, metaId);
     const decodedName = ethers.utils.parseBytes32String(metaData[0]);
     return { name: decodedName, value: metaData[1] };
   }

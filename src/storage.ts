@@ -43,47 +43,47 @@ export class Storage extends ContractAbi {
   }
 
   async name(): Promise<string> {
-    const name = await this.contract.methods.name();
+    const name = await this.contract.name();
     return name;
   }
 
   async version(): Promise<number> {
-    const version = await this.contract.methods.version();
+    const version = await this.contract.version();
     return parseInt(version);
   }
 
   async quorumRequired(proposalId: number): Promise<number> {
-    const quorum = await this.contract.methods.quorumRequired(proposalId);
+    const quorum = await this.contract.quorumRequired(proposalId);
     return parseInt(quorum);
   }
 
   async voteDelay(proposalId: number): Promise<number> {
-    const delay = await this.contract.methods.voteDelay(proposalId);
+    const delay = await this.contract.voteDelay(proposalId);
     return parseInt(delay);
   }
 
   async voteDuration(proposalId: number): Promise<number> {
-    const duration = await this.contract.methods.voteDuration(proposalId);
+    const duration = await this.contract.voteDuration(proposalId);
     return parseInt(duration);
   }
 
   async startTime(proposalId: number): Promise<number> {
-    const timeStr = await this.contract.methods.startTime(proposalId);
+    const timeStr = await this.contract.startTime(proposalId);
     return parseInt(timeStr);
   }
 
   async endTime(proposalId: number): Promise<number> {
-    const timeStr = await this.contract.methods.endTime(proposalId);
+    const timeStr = await this.contract.endTime(proposalId);
     return parseInt(timeStr);
   }
 
   async getWinningChoice(proposalId: number): Promise<number> {
-    const choiceNum = await this.contract.methods.getWinningChoice(proposalId);
+    const choiceNum = await this.contract.getWinningChoice(proposalId);
     return parseInt(choiceNum);
   }
 
   async choiceCount(proposalId: number): Promise<number> {
-    const choiceCount = await this.contract.methods.choiceCount(proposalId);
+    const choiceCount = await this.contract.choiceCount(proposalId);
     return parseInt(choiceCount);
   }
 
@@ -91,7 +91,7 @@ export class Storage extends ContractAbi {
     proposalId: number,
     choiceId: number
   ): Promise<{ name: string; description: string; transactionId: number; voteCount: number }> {
-    const metaData = await this.contract.methods.getChoice(proposalId, choiceId);
+    const metaData = await this.contract.getChoice(proposalId, choiceId);
     const decodedName = ethers.utils.parseBytes32String(metaData[0]);
     return {
       name: decodedName,
