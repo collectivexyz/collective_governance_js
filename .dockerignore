@@ -1,7 +1,8 @@
 dist/
 node_modules/
 .vscode/
-.devcontainer
+.github/
+.devcontainer/
 run.sh
 .env.example
 LICENSE

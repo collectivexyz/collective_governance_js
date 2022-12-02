@@ -30,7 +30,7 @@ ENV PATH      ${NVM_NODE_PATH}/bin:$PATH
 RUN npm install npm -g
 RUN npm install yarn -g
 
-ARG PROJECT=collective_governance
+ARG PROJECT=collective_governance_js
 WORKDIR /workspaces/${PROJECT}
 
 COPY package.json .

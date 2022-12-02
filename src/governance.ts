@@ -36,8 +36,9 @@ import { Contract, EventData } from 'web3-eth-contract';
 import { Wallet } from './wallet';
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
+import { Governance } from '@momentranks/governance';
 
-export class CollectiveGovernance {
+export class CollectiveGovernance implements Governance {
   private readonly logger = LoggerFactory.getLogger(module.filename);
 
   static ABI_NAME = 'Governance.json';
