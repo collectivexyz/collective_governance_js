@@ -32,12 +32,10 @@
  */
 
 import * as dotenv from 'dotenv';
-import { LoggerFactory } from './logging';
 
 dotenv.config();
 
 export class Config {
-  private readonly logger = LoggerFactory.getLogger(module.filename);
 
   public readonly abiPath: string = process.env.ABI_PATH || '';
   public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
@@ -55,6 +53,8 @@ export class Config {
   public readonly proposalId: string = process.env.PROPOSAL_ID || '';
   public readonly buildTxId: string = process.env.BUILD_TX || '';
   public readonly systemCreator: string = process.env.SYSTEM_CREATOR || '';
+  // default Goërli
+  public readonly chainId: string = process.env.CHAIN_ID || '5';
 
   constructor() {
     if (!this.abiPath) {
@@ -100,5 +100,9 @@ export class Config {
 
   public getProposalId(): number {
     return parseInt(this.proposalId);
+  }
+
+  public getChainId(): number {
+    return parseInt(this.chainId);
   }
 }

@@ -7,6 +7,16 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "id.ts",
+      "program": "${workspaceFolder}/src/id.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "simplevote.ts",
       "program": "${workspaceFolder}/src/simplevote.ts",
       "cwd": "${workspaceFolder}",
