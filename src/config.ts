@@ -36,7 +36,6 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export class Config {
-
   public readonly abiPath: string = process.env.ABI_PATH || '';
   public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
   public readonly voterClass: string = process.env.VOTER_CLASS || '';
