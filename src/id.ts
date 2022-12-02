@@ -31,24 +31,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ethers } from 'ethers';
-
-import { Config } from './config';
+import { connect } from './connect';
 import { LoggerFactory } from './logging';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
 const run = async () => {
   try {
-    const config = new Config();
-    const network = ethers.providers.getNetwork(config.getChainId());
-    const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl, network);
-    await provider.ready;
-    const wallet = new ethers.Wallet(config.privateKey, provider);
-    const abi = ['function name() public view returns (string)'];
-    const govContract = new ethers.Contract(config.builderAddress, abi, wallet);
-    const name = await govContract.name();
-    logger.info(name);
+    await connect();
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');

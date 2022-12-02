@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { connect } from './connect';
+import { connect, getProvider } from './connect';
 import { Config } from './config';
 import { LoggerFactory } from './logging';
 import { blocktimeNow, timeNow, timeout } from './time';
@@ -52,10 +52,12 @@ const run = async () => {
       throw Error('Vault not configured');
     }
 
+    const provider = await getProvider(config);
+
     const collective = await connect();
 
     const proposalId = await collective.governance.propose();
-    const blockTime = await blocktimeNow(collective.governance.web3);
+    const blockTime = await blocktimeNow(provider);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
 
     // add 10 minutes to ensure eta is within allowable lock range

@@ -31,8 +31,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Web3 from 'web3';
-import { Contract } from 'web3-eth-contract';
+import { ethers } from 'ethers';
+
 import { loadAbi, pathWithSlash } from './abi';
 import { LoggerFactory } from './logging';
 
@@ -41,16 +41,24 @@ export class ContractAbi {
 
   public readonly contractAddress: string;
 
-  protected readonly web3: Web3;
+  protected readonly provider: ethers.providers.Provider;
+  protected readonly wallet: ethers.Wallet;
   protected readonly contractAbi: any[];
-  protected readonly contract: Contract;
+  protected readonly contract: ethers.Contract;
 
-  constructor(abiPath: string, abiName: string, contractAddress: string, web3: Web3) {
+  constructor(
+    abiPath: string,
+    abiName: string,
+    contractAddress: string,
+    provider: ethers.providers.Provider,
+    wallet: ethers.Wallet
+  ) {
     this.contractAddress = contractAddress;
-    this.web3 = web3;
+    this.provider = provider;
+    this.wallet = wallet;
     const abiFile = pathWithSlash(abiPath) + abiName;
     this.logger.info(`Loading ABI: ${abiFile}`);
     this.contractAbi = loadAbi(abiFile);
-    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
+    this.contract = new ethers.Contract(this.contractAddress, this.contractAbi, this.wallet);
   }
 }

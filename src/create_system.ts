@@ -31,11 +31,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Web3 from 'web3';
+import { ethers } from 'ethers';
+
 import { Config } from './config';
+import { getProvider } from './connect';
 import { LoggerFactory } from './logging';
 import { System } from './system';
-import { EthWallet } from './wallet';
 import { timeNow } from './time';
 
 const logger = LoggerFactory.getLogger(module.filename);
@@ -48,12 +49,10 @@ const run = async () => {
       throw new Error('System creator is required');
     }
 
-    const web3 = new Web3(config.rpcUrl);
-    const wallet = new EthWallet(config.privateKey, web3);
-    wallet.connect();
-    logger.info(`Wallet connected: ${wallet.getAddress()}`);
+    const provider = await getProvider(config);
+    const wallet = new ethers.Wallet(config.privateKey, provider);
     logger.info('Building Governance Contract');
-    const system = new System(config.abiPath, config.systemCreator, web3, wallet, config.getGas());
+    const system = new System(config.abiPath, config.systemCreator, provider, wallet);
 
     const name = `Collective Governance ${timeNow()}`;
     const transactionHash = await system.createWithDelay(

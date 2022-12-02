@@ -29,48 +29,29 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import Web3 from 'web3';
-import { Contract, EventData } from 'web3-eth-contract';
-import { Wallet } from './wallet';
-import { loadAbi, pathWithSlash } from './abi';
-import { LoggerFactory } from './logging';
 
-export class VoterClassFactory {
+import { ethers } from 'ethers';
+import { ContractAbi } from './contractabi';
+
+export class VoterClassFactory extends ContractAbi {
   static ABI_NAME = 'VoterClassFactory.json';
 
-  private readonly logger = LoggerFactory.getLogger(module.filename);
-
-  public readonly contractAddress: string;
-
-  private readonly wallet: Wallet;
-  private readonly contractAbi: any[];
-  private readonly contract: Contract;
-  private readonly gas: number;
-
-  constructor(abiPath: string, contractAddress: string, web3: Web3, wallet: Wallet, gas: number) {
-    this.contractAddress = contractAddress;
-    this.wallet = wallet;
-    this.gas = gas;
-
-    const abiFile = pathWithSlash(abiPath) + VoterClassFactory.ABI_NAME;
-    this.logger.info(`Loading ABI: ${abiFile}`);
-    this.contractAbi = loadAbi(abiFile);
-    this.contract = new web3.eth.Contract(this.contractAbi, this.contractAddress);
-    this.contract.defaultAccount = web3.eth.defaultAccount;
-    this.logger.info(`Connected to contract ${this.contractAddress}`);
+  constructor(abiPath: string, contractAddress: string, provider: ethers.providers.Provider, wallet: ethers.Wallet) {
+    super(abiPath, VoterClassFactory.ABI_NAME, contractAddress, provider, wallet);
   }
 
   async createERC721(projectAddress: string, weight: number): Promise<string> {
     this.logger.debug(`Sending createERC721 to ${projectAddress}`);
-    const tx = await this.contract.methods.createERC721(projectAddress, weight).send({
-      from: this.wallet.getAddress(),
-      gas: this.gas,
-    });
+
+    const tx = await this.contract.createERC721(projectAddress, weight);
     this.logger.info(tx);
-    const event: EventData = tx.events['VoterClassCreated'];
-    const classAddress = event.returnValues['voterClass'];
-    if (classAddress) {
-      return classAddress;
+    const receipt = await tx.wait();
+    const created = receipt.events['VoterClassCreated'];
+    if (created) {
+      const classAddress = created.returnValues['voterClass'];
+      if (classAddress) {
+        return classAddress;
+      }
     }
     throw new Error('Unknown VoterClass created');
   }

@@ -31,11 +31,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Web3 from 'web3';
+import { ethers } from 'ethers';
+
 import { Config } from './config';
+import { getProvider } from './connect';
 import { GovernanceBuilder } from './governancebuilder';
 import { LoggerFactory } from './logging';
-import { EthWallet } from './wallet';
 import { timeNow } from './time';
 
 const logger = LoggerFactory.getLogger(module.filename);
@@ -43,12 +44,10 @@ const logger = LoggerFactory.getLogger(module.filename);
 const run = async () => {
   try {
     const config = new Config();
-    const web3 = new Web3(config.rpcUrl);
-    const wallet = new EthWallet(config.privateKey, web3);
-    wallet.connect();
-    logger.info(`Wallet connected: ${wallet.getAddress()}`);
     logger.info('Building Governance Contract');
-    const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
+    const provider = await getProvider(config);
+    const wallet = new ethers.Wallet(config.privateKey, provider);
+    const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, provider, wallet);
     const name = await governanceBuilder.name();
     logger.info(name);
 
@@ -57,7 +56,8 @@ const run = async () => {
     await governanceBuilder.withName(`Collective Governance ${timeNow()}`);
     await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
     await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
-    await governanceBuilder.withSupervisor(wallet.getAddress());
+    const walletAddress = await wallet.getAddress();
+    await governanceBuilder.withSupervisor(walletAddress);
     await governanceBuilder.withVoterClassAddress(config.voterClass);
     await governanceBuilder.withMinimumDuration(config.getMinimumDuration());
     const governanceAddress = await governanceBuilder.build();

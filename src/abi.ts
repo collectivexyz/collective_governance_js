@@ -35,7 +35,8 @@ import * as fs from 'fs';
 
 export function loadAbi(abiFile: string): [] {
   const abiData = fs.readFileSync(abiFile).toString();
-  return JSON.parse(abiData);
+  const abi = JSON.parse(abiData);
+  return abi;
 }
 
 export function pathWithSlash(path: string): string {

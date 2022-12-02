@@ -31,13 +31,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Web3 from 'web3';
+import { ethers } from 'ethers';
+
 import { Config } from './config';
 import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
 import { Storage } from './storage';
 import { MetaStorage } from './metastorage';
-import { EthWallet } from './wallet';
 import { GovernanceBuilder } from './governancebuilder';
 
 const logger = LoggerFactory.getLogger(module.filename);
@@ -48,24 +48,29 @@ export interface Collective {
   meta: MetaStorage;
 }
 
+export async function getProvider(config: Config): Promise<ethers.providers.Provider> {
+  const network = ethers.providers.getNetwork(config.getChainId());
+  const provider = new ethers.providers.WebSocketProvider(config.rpcUrl, network);
+  return provider;
+}
+
 export async function connect(): Promise<Collective> {
   try {
     const config = new Config();
-    const web3 = new Web3(config.rpcUrl);
-
-    const wallet = new EthWallet(config.privateKey, web3);
-    wallet.connect();
-    logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const contractAddress = await builder.discoverContractAddress(config.buildTxId);
-    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
+    const provider = await getProvider(config);
+    const wallet = new ethers.Wallet(config.privateKey, provider);
+    const address = await wallet.getAddress();
+    logger.info(`Wallet connected: ${address}`);
+    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, provider, wallet);
+    const contractAddress = await builder.discoverContract(config.buildTxId);
+    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, provider, wallet);
     logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
     const name = await governance.name();
     const version = await governance.version();
     logger.info(`${name} - ${version}`);
 
     const metaAddress = contractAddress.metaAddress;
-    const meta = new MetaStorage(config.abiPath, metaAddress, web3);
+    const meta = new MetaStorage(config.abiPath, metaAddress, provider, wallet);
     const metaName = await meta.name();
     const metaVersion = await meta.version();
 
@@ -83,7 +88,7 @@ export async function connect(): Promise<Collective> {
     logger.info(`Description: ${description}`);
 
     const storageAddress = contractAddress.storageAddress;
-    const storage = new Storage(config.abiPath, storageAddress, web3);
+    const storage = new Storage(config.abiPath, storageAddress, provider, wallet);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
 
