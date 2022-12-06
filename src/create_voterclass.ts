@@ -34,7 +34,7 @@
 import { ethers } from 'ethers';
 
 import { Config } from './config';
-import { VoterClassFactory } from './voterclassfactory';
+import { VoterClassFactory } from '@momentranks/governance';
 import { LoggerFactory } from './logging';
 import { getProvider } from './connect';
 

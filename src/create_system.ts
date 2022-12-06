@@ -36,8 +36,7 @@ import { ethers } from 'ethers';
 import { Config } from './config';
 import { getProvider } from './connect';
 import { LoggerFactory } from './logging';
-import { System } from './system';
-import { timeNow } from './time';
+import { System } from '@momentranks/governance';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
@@ -54,7 +53,7 @@ const run = async () => {
     logger.info('Building Governance Contract');
     const system = new System(config.abiPath, config.systemCreator, provider, wallet);
 
-    const name = `Collective Governance ${timeNow()}`;
+    const name = `Collective Governance`;
     const transactionHash = await system.createWithDelay(
       name,
       'https://collectivexyz.github.io/collective-governance-v1',

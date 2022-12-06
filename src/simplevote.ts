@@ -34,7 +34,7 @@
 import { Config } from './config';
 import { connect, getProvider } from './connect';
 import { LoggerFactory } from './logging';
-import { timeNow, blocktimeNow, timeout } from './time';
+import { timeNow, blocktimeNow, timeout } from '@momentranks/governance';
 
 const logger = LoggerFactory.getLogger(module.filename);
 

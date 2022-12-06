@@ -31,21 +31,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Meta, MetaStorage, Storage, CollectiveStorage, Governance, GovernanceBuilder, CollectiveGovernance } from '@momentranks/governance';
 import { ethers } from 'ethers';
 
 import { Config } from './config';
-import { CollectiveGovernance } from './governance';
 import { LoggerFactory } from './logging';
-import { Storage } from './storage';
-import { MetaStorage } from './metastorage';
-import { GovernanceBuilder } from './governancebuilder';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
 export interface Collective {
-  governance: CollectiveGovernance;
+  governance: Governance;
   storage: Storage;
-  meta: MetaStorage;
+  meta: Meta;
 }
 
 export async function getProvider(config: Config): Promise<ethers.providers.Provider> {
@@ -88,7 +85,7 @@ export async function connect(): Promise<Collective> {
     logger.info(`Description: ${description}`);
 
     const storageAddress = contractAddress.storageAddress;
-    const storage = new Storage(config.abiPath, storageAddress, provider, wallet);
+    const storage = new CollectiveStorage(config.abiPath, storageAddress, provider, wallet);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
 
