@@ -32,7 +32,7 @@
  */
 
 import { Config } from './config';
-import { connect, getProvider } from './connect';
+import { connect } from './connect';
 import { LoggerFactory } from './logging';
 import { blocktimeNow, timeNow, timeout } from '@momentranks/governance';
 
@@ -44,8 +44,7 @@ async function run() {
 
     logger.info(`Governance Started`);
     const collective = await connect();
-    const provider = await getProvider(config);
-    const blockTime = await blocktimeNow(provider);
+    const blockTime = await blocktimeNow(collective.web3);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
     // add 10 minutes to ensure eta is within allowable lock range
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;

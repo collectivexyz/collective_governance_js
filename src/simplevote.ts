@@ -31,8 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Config } from './config';
-import { connect, getProvider } from './connect';
+import { connect } from './connect';
 import { LoggerFactory } from './logging';
 import { timeNow, blocktimeNow, timeout } from '@momentranks/governance';
 
@@ -40,9 +39,6 @@ const logger = LoggerFactory.getLogger(module.filename);
 
 const run = async () => {
   try {
-    const config = new Config();
-
-    const provider = await getProvider(config);
     const collective = await connect();
 
     const proposalId = await collective.governance.propose();
@@ -60,7 +56,7 @@ const run = async () => {
 
     logger.info(`New Vote - ${proposalId}: quorum=${quorum}, duration=${duration}`);
 
-    const blockTime = await blocktimeNow(provider);
+    const blockTime = await blocktimeNow(collective.web3);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
     const startTime = await collective.storage.startTime(proposalId);
     while (timeNow() < startTime + blockTimeDelta) {

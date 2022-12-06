@@ -31,22 +31,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ethers } from 'ethers';
-
+import { EthWallet, VoterClassFactory } from '@momentranks/governance';
+import Web3 from 'web3';
 import { Config } from './config';
-import { VoterClassFactory } from '@momentranks/governance';
 import { LoggerFactory } from './logging';
-import { getProvider } from './connect';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
 const run = async () => {
   try {
     const config = new Config();
-    const provider = await getProvider(config);
-    const wallet = new ethers.Wallet(config.privateKey, provider);
+    const web3 = new Web3(config.rpcUrl);
+    const wallet = new EthWallet(config.privateKey, web3);
+    wallet.connect();
+    logger.info(`Wallet connected: ${wallet.getAddress()}`);
+
     logger.info('Building VoterClass');
-    const voterClassFactory = new VoterClassFactory(config.abiPath, config.voterFactory, provider, wallet);
+    const voterClassFactory = new VoterClassFactory(config.abiPath, config.voterFactory, web3, wallet, config.getGas());
     const classAddress = await voterClassFactory.createERC721(config.tokenContract, 1);
     logger.info(`VoterClass created at ${classAddress}`);
   } catch (error) {
