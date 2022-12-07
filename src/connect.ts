@@ -65,7 +65,7 @@ export async function connect(): Promise<Collective> {
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
     const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
-    const contractAddress = await builder.discoverContractAddress(config.buildTxId);
+    const contractAddress = await builder.discoverContract(config.buildTxId);
     const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
     logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
     const name = await governance.name();
