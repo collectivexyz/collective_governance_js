@@ -31,7 +31,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Wallet, EthWallet, Storage, Governance, Meta, GovernanceBuilder, CollectiveGovernance, MetaStorage, CollectiveStorage } from '@momentranks/governance';
+import {
+  Wallet,
+  EthWallet,
+  Storage,
+  Governance,
+  Meta,
+  GovernanceBuilder,
+  CollectiveGovernance,
+  MetaStorage,
+  CollectiveStorage,
+} from '@momentranks/governance';
 import Web3 from 'web3';
 import { Config } from './config';
 import { LoggerFactory } from './logging';

@@ -40,7 +40,7 @@ export class Config {
   public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
   public readonly voterClass: string = process.env.VOTER_CLASS || '';
   public readonly builderAddress: string = process.env.BUILDER_ADDRESS || '';
-  public readonly rpcUrl: string = process.env.RPC_URL || 'wss://localhost:8545';
+  public readonly rpcUrl: string = process.env.RPC_URL || '';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
   public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
   public readonly vaultContract: string = process.env.VAULT_CONTRACT || '';
@@ -86,11 +86,15 @@ export class Config {
   }
 
   public getGas(): number {
-    return parseInt(this.gas);
+    const maxGas = parseInt(this.gas);
+    if (isNaN(maxGas)) throw new Error(`${this.gas} is not a number`);
+    return maxGas;
   }
 
   public getMinimumDuration(): number {
-    return parseInt(this.minimumDuration);
+    const duration = parseInt(this.minimumDuration);
+    if (isNaN(duration)) throw new Error(`${this.minimumDuration} is not a number`);
+    return duration;
   }
 
   public getVaultValue(): number {
@@ -98,10 +102,14 @@ export class Config {
   }
 
   public getProposalId(): number {
-    return parseInt(this.proposalId);
+    const id = parseInt(this.proposalId);
+    if (isNaN(id)) throw new Error(`${this.proposalId} is not a number`);
+    return id;
   }
 
   public getChainId(): number {
-    return parseInt(this.chainId);
+    const id = parseInt(this.chainId);
+    if (isNaN(id)) throw new Error(`${this.proposalId} is not a number`);
+    return id;
   }
 }

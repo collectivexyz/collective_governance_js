@@ -15,19 +15,12 @@ sufficient for many types of operations but construction and building operations
    This will run the GovernanceBuilder and create a governance contract for the specified VoterClass.
    Set the `CONTRACT_ADDRESS` in `.env`
 
-# Contract Deployments
-
-| Contract   | Ethereum Address                           | Description                                                                       |
-| ---------- | ------------------------------------------ | --------------------------------------------------------------------------------- |
-| VoterClass | 0x491073195721a990A0b13e881394c8846985BCc1 | Class contract for 0xE3C82840FA0605a424Cc1ea6BC013D12909E4e69 enumerable contract |
-| Governance | 0xD6C840Ac9FfE0775746236584DCbC60c5693b411 | Governance contract for 0x491073195721a990A0b13e881394c8846985BCc1 voter class    |
-
 ## Example
 
-A vote using the `simplevote.ts`:
+A vote using the `simplevote.ts` example:
 
 ```
-mr@080e1bc37852:/workspaces/collective_governance_js$ yarn start
+mr@080e1bc37852:/workspaces/collective_governance_js$ yarn simple
 yarn run v1.22.19
 $ node dist/simplevote.js
 [

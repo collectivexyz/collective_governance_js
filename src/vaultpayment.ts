@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { connect} from './connect';
+import { connect } from './connect';
 import { Config } from './config';
 import { LoggerFactory } from './logging';
 import { blocktimeNow, timeNow, timeout } from '@momentranks/governance';
