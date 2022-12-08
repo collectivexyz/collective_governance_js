@@ -789,10 +789,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@momentranks/governance@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@momentranks/governance/-/governance-0.2.1.tgz#4d9ff5d2e09aa5e559ad0436bcc8d26d797f9860"
-  integrity sha512-nqwIvhlaPBLVU54YyrxSYJxW5AH8v1SF/xfHX4UXVHjRGc7hzKTc6knWyvBREeP+1uPkyjCbF5fpZWwntf5YAA==
+"@momentranks/governance@0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@momentranks/governance/-/governance-0.2.3.tgz#b92fb63adab4234e1d2d131f0ce3482c3fc9fcfe"
+  integrity sha512-VgoJR0HL8rK6kW+WdMqYmPs1/jLjSsQZC3JoSpnGC8biIc/eaBB/OAutgepHRGYJx9jPlXNlhJLkIxDDluzVJA==
   dependencies:
     pino "8.7.0"
     web3 "1.8.1"
