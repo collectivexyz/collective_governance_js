@@ -1,5 +1,12 @@
 # Collective Governance TypeScript Reference
 
+## Dependencies
+
+* Node.js
+* [@momentranks/governance](https://github.com/collectivexyz/governance)
+* Docker - recommened
+
+
 # Getting Started
 
 ### Gas Limit
