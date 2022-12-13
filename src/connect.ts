@@ -41,7 +41,7 @@ import {
   CollectiveGovernance,
   MetaStorage,
   CollectiveStorage,
-} from '@momentranks/governance';
+} from '@collectivexyz/governance';
 import Web3 from 'web3';
 import { Config } from './config';
 import { LoggerFactory } from './logging';

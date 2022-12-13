@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { EthWallet, GovernanceBuilder } from '@momentranks/governance';
+import { EthWallet, GovernanceBuilder } from '@collectivexyz/governance';
 import Web3 from 'web3';
 import { Config } from './config';
 import { LoggerFactory } from './logging';

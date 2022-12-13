@@ -33,7 +33,7 @@
 
 import { connect } from './connect';
 import { LoggerFactory } from './logging';
-import { timeNow, blocktimeNow, timeout } from '@momentranks/governance';
+import { timeNow, blocktimeNow, timeout } from '@collectivexyz/governance';
 
 const logger = LoggerFactory.getLogger(module.filename);
 
