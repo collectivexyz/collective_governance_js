@@ -1,11 +1,12 @@
 # Collective Governance TypeScript Reference
 
+This is a demonstration project for [@collectivexyz/governance](https://github.com/collectivexyz/governance). It includes example code for simple voting, choice voting, cancellation and configuration.
+
 ## Dependencies
 
-* Node.js
-* [@momentranks/governance](https://github.com/collectivexyz/governance)
-* Docker - recommened
-
+- Node.js
+- [@collectivexyz/governance](https://github.com/collectivexyz/governance)
+- Docker - recommended
 
 # Getting Started
 

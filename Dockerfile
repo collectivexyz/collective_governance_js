@@ -46,5 +46,6 @@ USER mr
 RUN yarn prettier:check
 RUN yarn eslint
 RUN yarn build
+RUN yarn test
 
-CMD yarn test
+CMD echo collective_governance_js
