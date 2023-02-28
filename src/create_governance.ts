@@ -56,7 +56,7 @@ const run = async () => {
     await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
     const walletAddress = await wallet.getAddress();
     await governanceBuilder.withSupervisor(walletAddress);
-    await governanceBuilder.withVoterClassAddress(config.voterClass);
+    await governanceBuilder.withCommunityClassAddress(config.communityClass);
     await governanceBuilder.withMinimumDuration(config.getMinimumDuration());
     const governanceAddress = await governanceBuilder.build();
     logger.info(`Governance contract created at ${governanceAddress}`);

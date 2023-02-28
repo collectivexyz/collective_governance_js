@@ -42,13 +42,6 @@ const run = async () => {
     const collective = await connect();
 
     const proposalId = await collective.governance.propose();
-    await collective.governance.describe(
-      proposalId,
-      'This is a vote on Collective Governance Contract',
-      'https://github.com/collectivexyz/collective_governance_js'
-    );
-    const metaId = await collective.governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
-    await collective.governance.addMeta(proposalId, 'vote_end', new Date((timeNow() + 3600) * 1000).toISOString());
     await collective.governance.configureWithDelay(proposalId, 1, 300, 3600);
 
     const quorum = await collective.storage.quorumRequired(proposalId);
@@ -71,16 +64,7 @@ const run = async () => {
 
     // voting shares
     await collective.governance.voteFor(proposalId);
-
-    const desc = await collective.meta.getMetaDescription(proposalId);
-    logger.info(`Description: ${desc}`);
-
-    const url = await collective.meta.getMetaUrl(proposalId);
-    logger.info(`Url: ${url}`);
-
-    const metaData = await collective.meta.getMeta(proposalId, metaId);
-    logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
-
+    
     let voteStatus = await collective.governance.isOpen(proposalId);
     const endTime = await collective.storage.endTime(proposalId);
     while (voteStatus) {

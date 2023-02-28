@@ -37,9 +37,10 @@ dotenv.config();
 
 export class Config {
   public readonly abiPath: string = process.env.ABI_PATH || '';
-  public readonly voterFactory: string = process.env.VOTER_FACTORY || '';
-  public readonly voterClass: string = process.env.VOTER_CLASS || '';
+  public readonly communityClass: string = process.env.COMMUNITY_CLASS || '';
   public readonly builderAddress: string = process.env.BUILDER_ADDRESS || '';
+  public readonly communityAddress: string = process.env.COMMUNITY_ADDRESS || '';
+  public readonly proposalAddress: string = process.env.PROPOSAL_ADDRESS || '';
   public readonly rpcUrl: string = process.env.RPC_URL || '';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
   public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
@@ -60,14 +61,14 @@ export class Config {
       throw new Error('ABI path required');
     }
 
-    if (!this.voterFactory) {
-      throw new Error('Voter factory is required');
-    }
-
     if (!this.builderAddress) {
       throw new Error('Builder address required');
     }
-
+    
+    if (!this.communityAddress) {
+      throw new Error('Community Builder address required');
+    }
+    
     if (!this.rpcUrl) {
       throw new Error('RPC url is required');
     }

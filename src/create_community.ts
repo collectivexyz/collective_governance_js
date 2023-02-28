@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { EthWallet, VoterClassFactory } from '@collectivexyz/governance';
+import { EthWallet, CommunityBuilder } from '@collectivexyz/governance';
 import Web3 from 'web3';
 import { Config } from './config';
 import { LoggerFactory } from './logging';
@@ -47,9 +47,12 @@ const run = async () => {
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
 
     logger.info('Building VoterClass');
-    const voterClassFactory = new VoterClassFactory(config.abiPath, config.voterFactory, web3, wallet, config.getGas());
-    const classAddress = await voterClassFactory.createERC721(config.tokenContract, 1);
-    logger.info(`VoterClass created at ${classAddress}`);
+    const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas());
+    await communityBuilder.aCommunity();
+    await communityBuilder.asErc721Community(config.tokenContract);
+    await communityBuilder.withQuorum(1);
+    const classAddress = await communityBuilder.build();
+    logger.info(`CommunityClass created at ${classAddress}`);
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');

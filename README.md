@@ -6,7 +6,7 @@ This is a demonstration project for [@collectivexyz/governance](https://github.c
 
 - Node.js
 - [@collectivexyz/governance](https://github.com/collectivexyz/governance)
-- Docker - recommended
+- Docker strongly recommended
 
 # Getting Started
 
@@ -15,13 +15,13 @@ This is a demonstration project for [@collectivexyz/governance](https://github.c
 Be sure to set the gas limit for the operation you are performing. The default limit 470000 is
 sufficient for many types of operations but construction and building operations may require 10x that.
 
-## Create a Voter Class using VoterClass Builder
+## Create a Community Class using CommunityBuilder
 
-1. Set VOTER_FACTORY in `.env` and run `yarn create_voterclass`
-2. The VoterClass address is stored in the voterClass parameter of the `VoterClassCreated` event
-3. Add the VoterClass address to the `.env` and run `yarn create_governance`
-   This will run the GovernanceBuilder and create a governance contract for the specified VoterClass.
-   Set the `CONTRACT_ADDRESS` in `.env`
+1. Set COMMUNITY_ADDRESS in `.env` and run `yarn create_community`
+2. The CommunityClass address is stored in the classAddress parameter of the `CommunityClassCreated` event
+3. Add the CommunityClass address to the `.env` and run `yarn create_governance`
+   This will run the GovernanceBuilder and create a governance contract for the specified CommunityClass.
+   Set the `BUILD_TX` in `.env` - this is the transaction for the build operation of the Governance contract.
 
 ## Example
 

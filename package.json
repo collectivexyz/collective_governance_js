@@ -11,7 +11,7 @@
     "vaultpayment": "node dist/vaultpayment.js",
     "create_system": "node dist/create_system.js",
     "create_governance": "node dist/create_governance.js",
-    "create_voterclass": "node dist/create_voterclass.js",
+    "create_community": "node dist/create_community.js",
     "build": "tsc",
     "prettier:check": "prettier --check src/**/*.ts",
     "prettier:write": "prettier --write src/**/*.ts src/**/*.ts",
@@ -21,23 +21,23 @@
   "author": "John Cairns",
   "license": "BSD-3-Clause",
   "devDependencies": {
+    "@types/jest": "28.1.7",
     "@typescript-eslint/eslint-plugin": "5.33.1",
     "@typescript-eslint/parser": "5.33.1",
-    "@types/jest": "28.1.7",
-    "prettier": "2.7.1",
     "eslint": "8.21.0",
+    "jest": "^28.1.1",
+    "prettier": "2.7.1",
+    "ts-jest": "28.0.5",
     "ts-mockito": "2.6.1",
     "ts-node": "10.9.1",
-    "jest": "^28.1.1",
-    "ts-jest": "28.0.5",
     "typescript": "4.9.4"
   },
   "dependencies": {
+    "@collectivexyz/governance": "file:collectivexyz-governance-v0.4.1.tgz",
     "@types/node": "18.6.3",
-    "@collectivexyz/governance": "0.4.0",
+    "dotenv": "16.0.1",
     "pino": "8.4.2",
-    "web3": "1.8.1",
-    "dotenv": "16.0.1"
+    "web3": "1.8.1"
   },
   "jest": {
     "moduleFileExtensions": [

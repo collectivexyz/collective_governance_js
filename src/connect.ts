@@ -37,6 +37,8 @@ import {
   Storage,
   Governance,
   Meta,
+  ProposalBuilder,
+  CommunityBuilder,  
   GovernanceBuilder,
   CollectiveGovernance,
   MetaStorage,
@@ -107,3 +109,45 @@ export async function connect(): Promise<Collective> {
     throw new Error('Run failed');
   }
 }
+
+export async function communityBuilder(): Promise<CommunityBuilder> {
+  try {
+    const config = new Config();
+    const web3 = new Web3(config.rpcUrl);
+    const wallet = new EthWallet(config.privateKey, web3);
+    wallet.connect();
+    logger.info(`Wallet connected: ${wallet.getAddress()}`);
+    const builder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas());
+    logger.info(`Connected to contract: ${config.communityAddress}`);
+    return builder;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Run failed');
+  }
+}
+
+export async function proposalBuilder(): Promise<ProposalBuilder> {
+
+
+
+  try {
+    const config = new Config();
+
+    if (!config.proposalAddress) {
+      throw new Error('Proposal Builder address required');
+    }
+  
+    const web3 = new Web3(config.rpcUrl);
+    const wallet = new EthWallet(config.privateKey, web3);
+    wallet.connect();
+    logger.info(`Wallet connected: ${wallet.getAddress()}`);
+    const builder = new ProposalBuilder(config.abiPath, config.proposalAddress, web3, wallet, config.getGas());
+    logger.info(`Connected to contract: ${config.proposalAddress}`);
+    return builder;
+  } catch (error) {
+    logger.error(error);
+    throw new Error('Run failed');
+  }
+}
+
+

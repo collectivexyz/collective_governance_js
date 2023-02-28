@@ -9,9 +9,10 @@ describe('Config', () => {
     process.env = {
       ...env,
       ABI_PATH: '/slash/path',
-      VOTER_FACTORY: '0x100',
-      VOTER_CLASS: '0x101',
-      BUILDER_ADDRESS: '0x102',
+      COMMUNITY_CLASS: '0x101',
+      BUILDER_ADDRESS: '0x1020',
+      PROPOSAL_ADDRESS: '0x1021',
+      COMMUNITY_ADDRESS: '0x1022',
       TOKEN_CONTRACT: '0x103',
       VAULT_CONTRACT: '0x104',
       SYSTEM_CREATOR: '0x105',
@@ -35,16 +36,20 @@ describe('Config', () => {
     expect(config.abiPath).toBe('/slash/path');
   });
 
-  it('must load voter factory', () => {
-    expect(config.voterFactory).toBe('0x100');
-  });
-
   it('must load voter class', () => {
-    expect(config.voterClass).toBe('0x101');
+    expect(config.communityClass).toBe('0x101');
   });
 
   it('must load builder address', () => {
-    expect(config.builderAddress).toBe('0x102');
+    expect(config.builderAddress).toBe('0x1020');
+  });
+
+  it('must load community address', () => {
+    expect(config.communityAddress).toBe('0x1022');
+  });
+
+  it('must load proposal address', () => {
+    expect(config.proposalAddress).toBe('0x1021');
   });
 
   it('must load token contract', () => {
@@ -96,14 +101,19 @@ describe('Config', () => {
     expect(() => new Config()).toThrow();
   });
 
-  it('must require voter factory', () => {
-    process.env.VOTER_FACTORY = '';
-    expect(() => new Config()).toThrow();
-  });
-
   it('must require builder address', () => {
     process.env.BUILDER_ADDRESS = '';
     expect(() => new Config()).toThrow();
+  });
+
+  it('must require community address', () => {
+    process.env.COMMUNITY_ADDRESS = '';
+    expect(() => new Config()).toThrow();
+  });
+
+  it('must not require proposal address', () => {
+    process.env.PROPOSAL_ADDRESS = '';
+    expect(() => new Config()).not.toThrow();
   });
 
   it('must require rpc url', () => {

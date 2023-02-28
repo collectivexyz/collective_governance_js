@@ -31,8 +31,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import Web3 from 'web3';
+
 import { Config } from './config';
-import { connect } from './connect';
+import { proposalBuilder, connect } from './connect';
 import { LoggerFactory } from './logging';
 import { blocktimeNow, timeNow, timeout } from '@collectivexyz/governance';
 
@@ -41,75 +43,71 @@ const logger = LoggerFactory.getLogger(module.filename);
 async function run() {
   try {
     const config = new Config();
+    const web3 = new Web3(config.rpcUrl);
 
     logger.info(`Governance Started`);
-    const collective = await connect();
-    const blockTime = await blocktimeNow(collective.web3);
+    const builder = await proposalBuilder();
+    const blockTime = await blocktimeNow(web3);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
     // add 10 minutes to ensure eta is within allowable lock range
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
-    const proposalId = await collective.governance.choiceVote(5);
-
-    await collective.governance.describe(
-      proposalId,
+    await builder.aProposal();
+    await builder.withDescription(
       'Who is the greatest in the world?',
       'https://github.com/collectivexyz/collective_governance_js'
     );
 
-    let tId = await collective.governance.attachTransaction(
-      proposalId,
+    
+    await builder.withTransaction(
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000000',
       etaOfLock
     );
-    await collective.governance.setChoice(proposalId, 0, 'Erling Haaland', 'Norwegian striker', tId);
-
-    tId = await collective.governance.attachTransaction(
-      proposalId,
+    await builder.withChoice('Erling Haaland', 'Norwegian striker', 1);
+    await builder.withTransaction(
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000001',
       etaOfLock
     );
-    await collective.governance.setChoice(proposalId, 1, 'Karim Benzema', 'French forward', tId);
-
-    tId = await collective.governance.attachTransaction(
-      proposalId,
+    await builder.withChoice('Karim Benzema', 'French forward', 2);
+    await builder.withTransaction(
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000002',
       etaOfLock
     );
-    await collective.governance.setChoice(proposalId, 2, 'Sadio Mané', 'Senegal striker', tId);
-
-    tId = await collective.governance.attachTransaction(
-      proposalId,
+    await builder.withChoice('Sadio Mané', 'Senegal striker', 3);
+    await builder.withTransaction(
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000003',
       etaOfLock
     );
-    await collective.governance.setChoice(proposalId, 3, 'Robert Lewandowski', 'Polish striker', tId);
-
-    tId = await collective.governance.attachTransaction(
-      proposalId,
+    await builder.withChoice('Robert Lewandowski', 'Polish striker', 4);
+    await builder.withTransaction(
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
       'set(address,uint256)',
       '0x0000000000000000000000000D837FF9Cc578508b8F80200e872Ee76F27057b70000000000000000000000000000000000000000000000000000000000000004',
       etaOfLock
     );
-    await collective.governance.setChoice(proposalId, 4, 'Mohamed Salah', 'Egyptian forward', tId);
+    await builder.withChoice('Mohamed Salah', 'Egyptian forward', 5);
 
-    const metaId = await collective.governance.addMeta(proposalId, 'vote_start', new Date().toISOString());
-    await collective.governance.addMeta(proposalId, 'vote_eta', new Date(etaOfLock * 1000).toISOString());
-    await collective.governance.configureWithDelay(proposalId, 3, 300, 3600);
+    await builder.withMeta( 'vote_start', new Date().toISOString());
+    const metaId = 1;
+    await builder.withMeta('vote_eta', new Date(etaOfLock * 1000).toISOString());
+    await builder.withQuorum(3);
+    await builder.withDelay(300);
+    await builder.withDuration(3600);
+    const proposalId = await builder.build();
 
+    const collective = await connect();
     const quorum = await collective.storage.quorumRequired(proposalId);
     const duration = await collective.storage.voteDuration(proposalId);
 
