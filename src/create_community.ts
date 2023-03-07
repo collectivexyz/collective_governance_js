@@ -46,7 +46,7 @@ const run = async () => {
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
 
-    logger.info('Building VoterClass');
+    logger.info('Building CommunityClass');
     const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas());
     await communityBuilder.aCommunity();
     await communityBuilder.asErc721Community(config.tokenContract);

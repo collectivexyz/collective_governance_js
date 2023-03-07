@@ -45,19 +45,19 @@ async function run() {
     const config = new Config();
     const web3 = new Web3(config.rpcUrl);
 
-    logger.info(`Governance Started`);
-    const builder = await proposalBuilder();
+    logger.info('Choice Vote Started');
     const blockTime = await blocktimeNow(web3);
     const blockTimeDelta = Math.abs(blockTime - timeNow());
     // add 10 minutes to ensure eta is within allowable lock range
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
+
+    const builder = await proposalBuilder();
     await builder.aProposal();
     await builder.withDescription(
       'Who is the greatest in the world?',
       'https://github.com/collectivexyz/collective_governance_js'
     );
 
-    
     await builder.withTransaction(
       '0x8CDad6BB54410ABA01033b9fBc0c5ECCB2a4137E',
       0,
@@ -99,12 +99,13 @@ async function run() {
     );
     await builder.withChoice('Mohamed Salah', 'Egyptian forward', 5);
 
-    await builder.withMeta( 'vote_start', new Date().toISOString());
+    await builder.withMeta('vote_start', new Date().toISOString());
     const metaId = 1;
     await builder.withMeta('vote_eta', new Date(etaOfLock * 1000).toISOString());
     await builder.withQuorum(3);
     await builder.withDelay(300);
     await builder.withDuration(3600);
+
     const proposalId = await builder.build();
 
     const collective = await connect();
@@ -127,13 +128,13 @@ async function run() {
     // voting shares
     await collective.governance.voteChoice(proposalId, 2);
 
-    const desc = await collective.meta.getMetaDescription(proposalId);
+    const desc = await collective.meta.getDescription(proposalId);
     logger.info(`Description: ${desc}`);
 
-    const url = await collective.meta.getMetaUrl(proposalId);
+    const url = await collective.meta.getUrl(proposalId);
     logger.info(`Url: ${url}`);
 
-    const metaData = await collective.meta.getMeta(proposalId, metaId);
+    const metaData = await collective.meta.get(proposalId, metaId);
     logger.info(`Attached Data: ${metaData.name}: ${metaData.value}`);
 
     let voteStatus = await collective.governance.isOpen(proposalId);

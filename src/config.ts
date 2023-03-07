@@ -53,6 +53,7 @@ export class Config {
   public readonly proposalId: string = process.env.PROPOSAL_ID || '';
   public readonly buildTxId: string = process.env.BUILD_TX || '';
   public readonly systemCreator: string = process.env.SYSTEM_CREATOR || '';
+
   // default Goërli
   public readonly chainId: string = process.env.CHAIN_ID || '5';
 

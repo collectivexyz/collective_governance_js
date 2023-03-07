@@ -43,7 +43,7 @@ const run = async () => {
 
     const proposalId = await collective.governance.propose();
     await collective.governance.configureWithDelay(proposalId, 1, 300, 3600);
-
+    
     const quorum = await collective.storage.quorumRequired(proposalId);
     const duration = await collective.storage.voteDuration(proposalId);
 
@@ -64,11 +64,12 @@ const run = async () => {
 
     // voting shares
     await collective.governance.voteFor(proposalId);
-    
+
     let voteStatus = await collective.governance.isOpen(proposalId);
     const endTime = await collective.storage.endTime(proposalId);
     while (voteStatus) {
-      const sleepFor = Math.max(endTime - timeNow() + blockTimeDelta, 1);
+      const voteWait = Math.min(endTime - timeNow() + blockTimeDelta, 300);
+      const sleepFor = Math.max(voteWait, 1);
       logger.info(`Voting in progress...sleeping for ${sleepFor}`);
       logger.info(`endTime: ${new Date(endTime * 1000).toISOString()}`);
       logger.flush();
