@@ -51,6 +51,7 @@ const run = async () => {
     await communityBuilder.aCommunity();
     await communityBuilder.asErc721Community(config.tokenContract);
     await communityBuilder.withQuorum(1);
+    await communityBuilder.withCommunitySupervisor(wallet.getAddress());
     const classAddress = await communityBuilder.build();
     logger.info(`CommunityClass created at ${classAddress}`);
   } catch (error) {
