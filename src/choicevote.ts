@@ -102,12 +102,12 @@ async function run() {
     await builder.withMeta('vote_start', new Date().toISOString());
     const metaId = 1;
     await builder.withMeta('vote_eta', new Date(etaOfLock * 1000).toISOString());
-    await builder.withQuorum(3);
+    await builder.withQuorum(25);
     await builder.withDelay(300);
     await builder.withDuration(3600);
 
     const proposalId = await builder.build();
-
+   
     const collective = await connect();
     const quorum = await collective.storage.quorumRequired(proposalId);
     const duration = await collective.storage.voteDuration(proposalId);
