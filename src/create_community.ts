@@ -48,9 +48,11 @@ const run = async () => {
 
     logger.info('Building CommunityClass');
     const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas());
+    const name = await communityBuilder.name();
+    logger.info(`Connected to ${name}`);
     await communityBuilder.aCommunity();
     await communityBuilder.asErc721Community(config.tokenContract);
-    await communityBuilder.withQuorum(1);
+    await communityBuilder.withQuorum(20);
     await communityBuilder.withCommunitySupervisor(wallet.getAddress());
     const classAddress = await communityBuilder.build();
     logger.info(`CommunityClass created at ${classAddress}`);

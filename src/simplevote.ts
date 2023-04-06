@@ -42,7 +42,7 @@ const run = async () => {
     const collective = await connect();
 
     const proposalId = await collective.governance.propose();
-    await collective.governance.configureWithDelay(proposalId, 1, 300, 3600);
+    await collective.governance.configureWithDelay(proposalId, 10, 300, 3600);
     
     const quorum = await collective.storage.quorumRequired(proposalId);
     const duration = await collective.storage.voteDuration(proposalId);
