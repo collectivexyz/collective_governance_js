@@ -102,7 +102,7 @@ async function run() {
     await builder.withMeta('vote_start', new Date().toISOString());
     const metaId = 1;
     await builder.withMeta('vote_eta', new Date(etaOfLock * 1000).toISOString());
-    await builder.withQuorum(25);
+    await builder.withQuorum(10);
     await builder.withDelay(300);
     await builder.withDuration(3600);
 

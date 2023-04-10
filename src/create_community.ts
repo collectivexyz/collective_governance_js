@@ -52,7 +52,7 @@ const run = async () => {
     logger.info(`Connected to ${name}`);
     await communityBuilder.aCommunity();
     await communityBuilder.asErc721Community(config.tokenContract);
-    await communityBuilder.withQuorum(20);
+    await communityBuilder.withQuorum(17);
     await communityBuilder.withCommunitySupervisor(wallet.getAddress());
     const classAddress = await communityBuilder.build();
     logger.info(`CommunityClass created at ${classAddress}`);
