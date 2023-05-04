@@ -290,10 +290,10 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@collectivexyz/governance@0.8.3":
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/@collectivexyz/governance/-/governance-0.8.3.tgz#ac222a795538d718ef957021ea5e55a597698cbd"
-  integrity sha512-+Tl8ZiUU40HDQskN4+s/shQLM4kIlUk6rruVBxjDzc97yiAQwCaOI+IME7tOBiOkDeTrLWGuMe768ojpkRc75Q==
+"@collectivexyz/governance@0.8.4":
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/@collectivexyz/governance/-/governance-0.8.4.tgz#21aa45de3daccf934e3c8fadaceb246656b531d0"
+  integrity sha512-GD0alUnysyuP+s6BQ7XRerTgfEs2PeKlA+8Q9ZiC+EeTOJ6qAU/PO2dIBWYB3akLzyNvq70kEcO7AzVGkkSMww==
   dependencies:
     pino "8.7.0"
     web3 "1.8.2"
