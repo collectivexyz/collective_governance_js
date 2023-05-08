@@ -51,7 +51,7 @@ const run = async () => {
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
     logger.info('Building Governance Contract');
-    const system = new System(config.abiPath, config.systemCreator, web3, wallet, config.getGas());
+    const system = new System(config.abiPath, config.systemCreator, web3, wallet, config.getGas(), config.gasPrice);
 
     const name = `Collective Governance`;
     const transactionHash = await system.createWithDelay(

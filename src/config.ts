@@ -48,7 +48,8 @@ export class Config {
   public readonly vaultValue: string = process.env.VAULT_VALUE || '';
   public readonly vaultSignature: string = process.env.VAULT_SIGNATURE || '';
   public readonly vaultCalldata: string = process.env.VAULT_CALLDATA || '';
-  public readonly gas: string = process.env.GAS || '470000';
+  public readonly gas: string = process.env.GAS || '1000000';
+  public readonly gasPrice: string = process.env.GAS_PRICE || '1';
   public readonly minimumDuration: string = process.env.MINIMUM_DURATION || '86400';
   public readonly proposalId: string = process.env.PROPOSAL_ID || '';
   public readonly buildTxId: string = process.env.BUILD_TX || '';
@@ -65,11 +66,11 @@ export class Config {
     if (!this.builderAddress) {
       throw new Error('Builder address required');
     }
-    
+
     if (!this.communityAddress) {
       throw new Error('Community Builder address required');
     }
-    
+
     if (!this.rpcUrl) {
       throw new Error('RPC url is required');
     }

@@ -38,7 +38,7 @@ import {
   Governance,
   Meta,
   ProposalBuilder,
-  CommunityBuilder,  
+  CommunityBuilder,
   GovernanceBuilder,
   CollectiveGovernance,
   MetaStorage,
@@ -66,16 +66,16 @@ export async function connect(): Promise<Collective> {
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas());
+    const builder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas(), config.gasPrice);
     const contractAddress = await builder.discoverContract(config.buildTxId);
-    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas());
+    const governance = new CollectiveGovernance(config.abiPath, contractAddress.governanceAddress, web3, wallet, config.getGas(), config.gasPrice);
     logger.info(`Connected to contract: ${contractAddress.governanceAddress}`);
     const name = await governance.name();
     const version = await governance.version();
     logger.info(`${name} - ${version}`);
 
     const metaAddress = contractAddress.metaAddress;
-    const meta = new MetaStorage(config.abiPath, metaAddress, web3);
+    const meta = new MetaStorage(config.abiPath, metaAddress, web3, wallet, config.getGas(), config.gasPrice);
     const metaName = await meta.name();
     const metaVersion = await meta.version();
 
@@ -93,7 +93,7 @@ export async function connect(): Promise<Collective> {
     logger.info(`Description: ${description}`);
 
     const storageAddress = contractAddress.storageAddress;
-    const storage = new CollectiveStorage(config.abiPath, storageAddress, web3);
+    const storage = new CollectiveStorage(config.abiPath, storageAddress, web3, wallet, config.getGas(), config.gasPrice);
     const storageName = await storage.name();
     const storageVersion = await storage.version();
 
@@ -117,7 +117,7 @@ export async function communityBuilder(): Promise<CommunityBuilder> {
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    const builder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas());
+    const builder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas(), config.gasPrice);
     logger.info(`Connected to contract: ${config.communityAddress}`);
     return builder;
   } catch (error) {
@@ -136,12 +136,12 @@ export async function proposalBuilder(): Promise<ProposalBuilder> {
     if (!config.proposalAddress) {
       throw new Error('Proposal Builder address required');
     }
-  
+
     const web3 = new Web3(config.rpcUrl);
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
-    const builder = new ProposalBuilder(config.abiPath, config.proposalAddress, web3, wallet, config.getGas());
+    const builder = new ProposalBuilder(config.abiPath, config.proposalAddress, web3, wallet, config.getGas(), config.gasPrice);
     logger.info(`Connected to contract: ${config.proposalAddress}`);
     return builder;
   } catch (error) {

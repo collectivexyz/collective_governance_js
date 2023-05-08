@@ -47,7 +47,7 @@ const run = async () => {
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
 
     logger.info('Building CommunityClass');
-    const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas());
+    const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas(), config.gasPrice);
     const name = await communityBuilder.name();
     logger.info(`Connected to ${name}`);
     await communityBuilder.aCommunity();

@@ -21,6 +21,7 @@ describe('Config', () => {
       RPC_URL: 'http://collective.xyz',
       PRIVATE_KEY: '0xefgabc',
       GAS: '1',
+      GAS_PRICE: '7',
       MINIMUM_DURATION: '300',
       PROPOSAL_ID: '22',
       BUILD_TX: '0xffff',
@@ -81,7 +82,11 @@ describe('Config', () => {
   });
 
   it('must load gas price limit', () => {
-    expect(config.gas).toBe('1');
+    expect(config.getGas()).toBe(1);
+  });
+
+  it('must load gas price', () => {
+    expect(config.gasPrice).toBe('7');
   });
 
   it('must load minimum duration', () => {
