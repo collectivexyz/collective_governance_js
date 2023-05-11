@@ -51,7 +51,6 @@ async function run() {
     // add 10 minutes to ensure eta is within allowable lock range
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
 
-    /*
     const builder = await proposalBuilder();
     //await builder.aProposal();
     await builder.withDescription(
@@ -106,9 +105,7 @@ async function run() {
     await builder.withQuorum(5000);
     await builder.withDelay(300);
     await builder.withDuration(3600);
-    */
-    const proposalId = 2; // await builder.build();
-    const metaId = 1;
+    const proposalId = await builder.build();
 
     const collective = await connect();
     const quorum = await collective.storage.quorumRequired(proposalId);

@@ -50,7 +50,7 @@ const run = async () => {
     const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas(), config.gasPrice);
     const name = await communityBuilder.name();
     logger.info(`Connected to ${name}`);
-    await communityBuilder.aCommunity();
+    //await communityBuilder.aCommunity();
     await communityBuilder.asErc20Community(config.tokenContract);
     await communityBuilder.withQuorum(5000);
     await communityBuilder.withCommunitySupervisor(wallet.getAddress());
