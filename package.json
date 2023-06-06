@@ -12,6 +12,7 @@
     "create_system": "node dist/create_system.js",
     "create_governance": "node dist/create_governance.js",
     "create_community": "node dist/create_community.js",
+    "create_treasury": "node dist/create_treasury.js",
     "build": "tsc",
     "clean": "rm -rf dist",
     "prettier:check": "prettier --check src/**/*.ts",
@@ -34,7 +35,7 @@
     "typescript": "4.9.4"
   },
   "dependencies": {
-    "@collectivexyz/governance": "0.8.11",
+    "@collectivexyz/governance": "file:collectivexyz-governance-v0.8.14.tgz",
     "@types/node": "16.11.7",
     "dotenv": "16.0.1",
     "pino": "8.12.1",

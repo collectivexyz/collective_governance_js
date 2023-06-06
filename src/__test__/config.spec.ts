@@ -25,6 +25,8 @@ describe('Config', () => {
       MINIMUM_DURATION: '300',
       PROPOSAL_ID: '22',
       BUILD_TX: '0xffff',
+      TREASURY_BUILDER_ADDRESS: '0x1023',
+      TREASURY_APPROVER_LIST: '0x1, 0x2,     \t0x3',
     };
     config = new Config();
   });
@@ -51,6 +53,10 @@ describe('Config', () => {
 
   it('must load proposal address', () => {
     expect(config.proposalAddress).toBe('0x1021');
+  });
+
+  it('must load treasury builder address', () => {
+    expect(config.treasuryBuilderAddress).toBe('0x1023');
   });
 
   it('must load token contract', () => {
@@ -169,5 +175,15 @@ describe('Config', () => {
     process.env.CHAIN_ID = 'eight';
     config = new Config();
     expect(() => config.getChainId()).toThrow();
+  });
+
+  it('must load the treasury approver list if set', () => {
+    expect(config.getTreasuryApproverList()).toEqual(['0x1', '0x2', '0x3']);
+  });
+
+  it('must return empty list if treasury approver list is not set', () => {
+    process.env.TREASURY_APPROVER_LIST = '';
+    config = new Config();
+    expect(config.getTreasuryApproverList()).toEqual([]);
   });
 });

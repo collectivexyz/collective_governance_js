@@ -41,6 +41,8 @@ export class Config {
   public readonly builderAddress: string = process.env.BUILDER_ADDRESS || '';
   public readonly communityAddress: string = process.env.COMMUNITY_ADDRESS || '';
   public readonly proposalAddress: string = process.env.PROPOSAL_ADDRESS || '';
+  public readonly treasuryBuilderAddress: string = process.env.TREASURY_BUILDER_ADDRESS || '';
+  public readonly treasuryApproverList: string = process.env.TREASURY_APPROVER_LIST || '';
   public readonly rpcUrl: string = process.env.RPC_URL || '';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
   public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
@@ -114,5 +116,10 @@ export class Config {
     const id = parseInt(this.chainId);
     if (isNaN(id)) throw new Error(`${this.proposalId} is not a number`);
     return id;
+  }
+
+  public getTreasuryApproverList(): string[] {
+    if(!this.treasuryApproverList) return [];
+    return this.treasuryApproverList.split(',').map((address) => address.trim());
   }
 }

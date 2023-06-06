@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { EthWallet, CommunityBuilder } from '@collectivexyz/governance';
+import { EthWallet, TreasuryBuilder } from '@collectivexyz/governance';
 import Web3 from 'web3';
 import { Config } from './config';
 import { LoggerFactory } from './logging';
@@ -41,21 +41,38 @@ const logger = LoggerFactory.getLogger(module.filename);
 const run = async () => {
   try {
     const config = new Config();
+
+    if(!config.treasuryBuilderAddress) {
+      throw new Error('TreasuryBuilder address is not set');
+    }
+
+    if(!config.getTreasuryApproverList()) {
+      throw new Error('Treasury approver list is not set');
+    }
+
     const web3 = new Web3(config.rpcUrl);
     const wallet = new EthWallet(config.privateKey, web3);
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
 
-    logger.info('Building CommunityClass');
-    const communityBuilder = new CommunityBuilder(config.abiPath, config.communityAddress, web3, wallet, config.getGas(), config.gasPrice);
-    const name = await communityBuilder.name();
+    logger.info('Building Treasury');
+    const treasuryBuilder = new TreasuryBuilder(config.abiPath, config.treasuryBuilderAddress, web3, wallet, config.getGas(), config.gasPrice);
+    const name = await treasuryBuilder.name();
     logger.info(`Connected to ${name}`);
-    await communityBuilder.aCommunity();
-    await communityBuilder.asErc20Community(config.tokenContract);
-    await communityBuilder.withQuorum(5000);
-    await communityBuilder.withCommunitySupervisor(wallet.getAddress());
-    const classAddress = await communityBuilder.build();
-    logger.info(`CommunityClass created at ${classAddress}`);
+    await treasuryBuilder.aTreasury();
+    await treasuryBuilder.withMinimumApprovalRequirement(1);
+    await treasuryBuilder.withTimeLockDelay(3600);
+    const approverList = config.getTreasuryApproverList();
+    for(let i=0; i<approverList.length; i++) {
+      const approver = approverList[i];
+      if(approver) {
+        await treasuryBuilder.withApprover(approver);
+      } else {
+        throw new Error('Empty approver is not permitted');
+      }
+    };
+    const treasuryAddress = await treasuryBuilder.build();
+    logger.info(`Treasury created at ${treasuryAddress}`);
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');
