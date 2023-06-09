@@ -43,6 +43,10 @@ export class Config {
   public readonly proposalAddress: string = process.env.PROPOSAL_ADDRESS || '';
   public readonly treasuryBuilderAddress: string = process.env.TREASURY_BUILDER_ADDRESS || '';
   public readonly treasuryApproverList: string = process.env.TREASURY_APPROVER_LIST || '';
+  public readonly treasuryAddress: string = process.env.TREASURY_ADDRESS || '';
+  public readonly treasuryPayee: string = process.env.TREASURY_PAYEE || '';
+  public readonly treasuryApproveQuantity: string = process.env.TREASURY_APPROVE_QUANTITY || '';
+  public readonly treasuryApproveMulti: string = process.env.TREASURY_APPROVE_MULTI || '';
   public readonly rpcUrl: string = process.env.RPC_URL || '';
   public readonly privateKey: string = process.env.PRIVATE_KEY || '';
   public readonly tokenContract: string = process.env.TOKEN_CONTRACT || '';
@@ -119,7 +123,18 @@ export class Config {
   }
 
   public getTreasuryApproverList(): string[] {
-    if(!this.treasuryApproverList) return [];
+    if (!this.treasuryApproverList) return [];
     return this.treasuryApproverList.split(',').map((address) => address.trim());
+  }
+
+  public getTreasuryApproveMultiList(): string[] {
+    if (!this.treasuryApproveMulti) return [];
+    return this.treasuryApproveMulti.split(',').map((address) => address.trim());
+  }
+
+  public getTreasuryApproveQuantity(): number {
+    const quantity = parseInt(this.treasuryApproveQuantity);
+    if (isNaN(quantity)) throw new Error(`${this.treasuryApproveQuantity} is not a number`);
+    return quantity;
   }
 }

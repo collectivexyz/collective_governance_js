@@ -30,8 +30,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { EthWallet, TreasuryBuilder } from '@collectivexyz/governance';
+import { EthWallet, Treasury } from '@collectivexyz/governance';
 import Web3 from 'web3';
 import { Config } from './config';
 import { LoggerFactory } from './logging';
@@ -42,12 +41,12 @@ const run = async () => {
   try {
     const config = new Config();
 
-    if (!config.treasuryBuilderAddress) {
-      throw new Error('TreasuryBuilder address is not set');
+    if (!config.treasuryAddress) {
+      throw new Error('Treasury address is not set');
     }
 
-    if (!config.getTreasuryApproverList()) {
-      throw new Error('Treasury approver list is not set');
+    if (!config.treasuryPayee) {
+      throw new Error('Treasury payee is not set');
     }
 
     const web3 = new Web3(config.rpcUrl);
@@ -55,31 +54,9 @@ const run = async () => {
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
 
-    logger.info('Building Treasury');
-    const treasuryBuilder = new TreasuryBuilder(
-      config.abiPath,
-      config.treasuryBuilderAddress,
-      web3,
-      wallet,
-      config.getGas(),
-      config.gasPrice
-    );
-    const name = await treasuryBuilder.name();
-    logger.info(`Connected to ${name}`);
-    await treasuryBuilder.aTreasury();
-    await treasuryBuilder.withMinimumApprovalRequirement(1);
-    await treasuryBuilder.withTimeLockDelay(3600);
-    const approverList = config.getTreasuryApproverList();
-    for (let i = 0; i < approverList.length; i++) {
-      const approver = approverList[i];
-      if (approver) {
-        await treasuryBuilder.withApprover(approver);
-      } else {
-        throw new Error('Empty approver is not permitted');
-      }
-    }
-    const treasuryAddress = await treasuryBuilder.build();
-    logger.info(`Treasury created at ${treasuryAddress}`);
+    logger.info(`Connecting to Treasury at ${config.treasuryAddress}`);
+    const treasury = new Treasury(config.abiPath, config.treasuryAddress, web3, wallet, config.getGas(), config.gasPrice);
+    await treasury.approve(config.treasuryPayee, config.getTreasuryApproveQuantity());
   } catch (error) {
     logger.error(error);
     throw new Error('Run failed');

@@ -63,6 +63,16 @@
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "treasury_approve_multi.ts",
+      "program": "${workspaceFolder}/src/treasury_approve_multi.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js", "!**/node_modules/**"],
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

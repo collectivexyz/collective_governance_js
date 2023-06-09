@@ -27,6 +27,10 @@ describe('Config', () => {
       BUILD_TX: '0xffff',
       TREASURY_BUILDER_ADDRESS: '0x1023',
       TREASURY_APPROVER_LIST: '0x1, 0x2,     \t0x3',
+      TREASURY_ADDRESS: '0x1024',
+      TREASURY_PAYEE: '0x106',
+      TREASURY_APPROVE_QUANTITY: '100',
+      TREASURY_APPROVE_MULTI: '\t0xa\t, 0xb , 0xc',
     };
     config = new Config();
   });
@@ -185,5 +189,33 @@ describe('Config', () => {
     process.env.TREASURY_APPROVER_LIST = '';
     config = new Config();
     expect(config.getTreasuryApproverList()).toEqual([]);
+  });
+
+  it('must load the treasury address', () => {
+    expect(config.treasuryAddress).toBe('0x1024');
+  });
+
+  it('must load the treasury payee', () => {
+    expect(config.treasuryPayee).toBe('0x106');
+  });
+
+  it('must load treasury approve quantity', () => {
+    expect(config.getTreasuryApproveQuantity()).toBe(100);
+  });
+
+  it('must enforce treasury approve quantity as a number', () => {
+    process.env.TREASURY_APPROVE_QUANTITY = 'note to self';
+    config = new Config();
+    expect(() => config.getTreasuryApproveQuantity()).toThrowError();
+  });
+
+  it('must load the treasury approve multi if set', () => {
+    expect(config.getTreasuryApproveMultiList()).toEqual(['0xa', '0xb', '0xc']);
+  });
+
+  it('must return empty list if treasury approve multi is not set', () => {
+    process.env.TREASURY_APPROVE_MULTI = '';
+    config = new Config();
+    expect(config.getTreasuryApproveMultiList()).toEqual([]);
   });
 });
