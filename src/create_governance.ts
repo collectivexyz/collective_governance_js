@@ -46,14 +46,21 @@ const run = async () => {
     wallet.connect();
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
     logger.info('Building Governance Contract');
-    const governanceBuilder = new GovernanceBuilder(config.abiPath, config.builderAddress, web3, wallet, config.getGas(), config.gasPrice);
+    const governanceBuilder = new GovernanceBuilder(
+      config.abiPath,
+      config.builderAddress,
+      web3,
+      wallet,
+      config.getGas(),
+      config.gasPrice
+    );
     const name = await governanceBuilder.name();
     logger.info(name);
-    //await governanceBuilder.aGovernance();
-    //await governanceBuilder.withName(`Collective Governance`);
-    //await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
-    //await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
-    //await governanceBuilder.withCommunityClassAddress(config.communityClass);
+    await governanceBuilder.aGovernance();
+    await governanceBuilder.withName(`Collective Governance`);
+    await governanceBuilder.withUrl('https://collectivexyz.github.io/collective-governance-v1');
+    await governanceBuilder.withDescription('Collective Governance contract created by collective_governance_js.');
+    await governanceBuilder.withCommunityClassAddress(config.communityClass);
     const governanceAddress = await governanceBuilder.build();
     logger.info(`Governance contract created at ${governanceAddress}`);
   } catch (error) {

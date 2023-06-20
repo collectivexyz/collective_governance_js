@@ -52,7 +52,7 @@ async function run() {
     const etaOfLock = timeNow() + config.getMinimumDuration() + blockTimeDelta + 10 * 60;
 
     const builder = await proposalBuilder();
-    //await builder.aProposal();
+    await builder.aProposal();
     await builder.withDescription(
       'Who is the greatest in the world?',
       'https://github.com/collectivexyz/collective_governance_js'
