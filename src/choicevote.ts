@@ -104,7 +104,7 @@ async function run() {
     await builder.withMeta('vote_eta', new Date(etaOfLock * 1000).toISOString());
     await builder.withQuorum(5000);
     await builder.withDelay(300);
-    await builder.withDuration(3600);
+    await builder.withDuration(86400);
     const proposalId = await builder.build();
 
     const collective = await connect();

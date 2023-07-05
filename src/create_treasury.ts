@@ -68,7 +68,7 @@ const run = async () => {
     logger.info(`Connected to ${name}`);
     await treasuryBuilder.aTreasury();
     await treasuryBuilder.withMinimumApprovalRequirement(1);
-    await treasuryBuilder.withTimeLockDelay(3600);
+    await treasuryBuilder.withTimeLockDelay(86400);
     const approverList = config.getTreasuryApproverList();
     for (let i = 0; i < approverList.length; i++) {
       const approver = approverList[i];

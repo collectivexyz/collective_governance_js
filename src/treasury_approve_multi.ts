@@ -64,7 +64,7 @@ const run = async () => {
     logger.info(`Wallet connected: ${wallet.getAddress()}`);
     const blockTime = await blocktimeNow(web3);
     // slight grace period is added to ensure schedule time is past minimum time for time lock
-    const scheduleTime = blockTime + 3600 + 300;
+    const scheduleTime = blockTime + 86400 + 300;
     logger.info(`Schedule time: ${scheduleTime}`);
     const transaction = {
       target: config.treasuryPayee,

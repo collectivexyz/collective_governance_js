@@ -39,7 +39,7 @@ RUN yarn install --dev
 
 COPY . .
 
-RUN chown -R mr.mr .
+RUN chown -R mr:mr .
 
 USER mr
 

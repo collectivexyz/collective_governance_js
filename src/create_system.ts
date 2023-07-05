@@ -61,7 +61,7 @@ const run = async () => {
       config.tokenContract,
       1,
       300,
-      3600
+      86400
     );
     logger.info(`Governance contract created by transaction ${transactionHash}`);
   } catch (error) {
