@@ -37,9 +37,8 @@ COPY package.json .
 COPY yarn.lock .
 RUN yarn install --dev
 
-COPY . .
-
 RUN chown -R mr:mr .
+COPY --chown=mr.mr . .
 
 USER mr
 
